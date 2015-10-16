@@ -37,7 +37,7 @@ class EDD_MailChimp extends EDD_Newsletter {
 			if( false === $list_data ) {
 
 				$api       = new EDD_MailChimp_API( trim( $edd_options['eddmc_api'] ) );
-				$list_data = $api->call('lists/list');
+				$list_data = $api->call('lists/list', array( 'limit' => 100 ) );
 
 				set_transient( 'edd_mailchimp_list_data', $list_data, 24*24*24 );
 			}
