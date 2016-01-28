@@ -20,6 +20,7 @@ class EDD_MailChimp extends EDD_Newsletter {
 			$this->checkout_label = __( 'Signup for the newsletter', 'eddmc' );
 		}
 
+		add_filter( 'edd_settings_sections_extensions', array( $this, 'subsection' ), 10, 1 );
 		add_filter( 'edd_settings_extensions_sanitize', array( $this, 'save_settings' ) );
 
 	}
@@ -106,6 +107,19 @@ class EDD_MailChimp extends EDD_Newsletter {
 	}
 
 	/**
+	 * Register our subsection for EDD 2.5
+	 *
+	 * @since  2.5.6
+	 * @param  array $sections The subsections
+	 * @return array           The subsections with Mailchimp added
+	 */
+	function subsection( $sections ) {
+		$sections['mailchimp'] = __( 'Mailchimp', 'eddmc' );
+		return $sections;
+	}
+
+
+	/**
 	 * Registers the plugin settings
 	 */
 	public function settings( $settings ) {
@@ -151,6 +165,10 @@ class EDD_MailChimp extends EDD_Newsletter {
 				'type'    => 'checkbox'
 			)
 		);
+
+		if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
+			$eddmc_settings = array( 'mailchimp' => $eddmc_settings );
+		}
 
 		return array_merge( $settings, $eddmc_settings );
 	}
