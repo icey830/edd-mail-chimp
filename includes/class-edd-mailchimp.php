@@ -114,7 +114,7 @@ class EDD_MailChimp extends EDD_Newsletter {
 	 * @return array           The subsections with Mailchimp added
 	 */
 	function subsection( $sections ) {
-		$sections['mailchimp'] = __( 'Mailchimp', 'eddmc' );
+		$sections['mailchimp'] = __( 'MailChimp', 'eddmc' );
 		return $sections;
 	}
 
