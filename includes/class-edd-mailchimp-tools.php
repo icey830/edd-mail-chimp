@@ -61,7 +61,7 @@ class EDD_MC_Tools {
 	 * @since  2.5.3
 	 */
 	function register_batch_processor() {
-		add_action( 'edd_batch_export_class_include', array( $this, 'inclue_batch_processor' ), 10, 1 );
+		add_action( 'edd_batch_export_class_include', array( $this, 'include_batch_processor' ), 10, 1 );
 	}
 
 	/**
@@ -71,7 +71,7 @@ class EDD_MC_Tools {
 	 * @param  string $class The class being requested to run for the batch export
 	 * @return void
 	 */
-	function inclue_batch_processor( $class ) {
+	function include_batch_processor( $class ) {
 
 		if ( 'EDD_Batch_Mailchimp_Ecommerce' === $class ) {
 			require_once EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-batch-processor.php';
