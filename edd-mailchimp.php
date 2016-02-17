@@ -18,6 +18,9 @@ define( 'EDD_MAILCHIMP_PATH', dirname( __FILE__ ) );
 |--------------------------------------------------------------------------
 */
 
+// Require the drewm/mailchimp-api wrapper lib
+require("vendor/autoload.php")
+
 if ( class_exists( 'EDD_License' ) && is_admin() ) {
   $eddmc_license = new EDD_License( __FILE__, EDD_MAILCHIMP_PRODUCT_NAME, '2.5.6', 'Pippin Williamson' );
 }
