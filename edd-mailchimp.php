@@ -25,6 +25,11 @@ if ( class_exists( 'EDD_License' ) && is_admin() ) {
   $eddmc_license = new EDD_License( __FILE__, EDD_MAILCHIMP_PRODUCT_NAME, '2.5.6', 'Pippin Williamson' );
 }
 
+if( ! class_exists( 'EDD_MailChimp_V3_Upgrade' ) ) {
+  include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-v3-upgrade.php' );
+  new EDD_MailChimp_V3_Upgrade;
+}
+
 if( ! class_exists( 'EDD_Newsletter' ) ) {
 	include( EDD_MAILCHIMP_PATH . '/includes/class-edd-newsletter.php' );
 }
