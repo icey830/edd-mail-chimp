@@ -160,11 +160,13 @@ class EDD_MailChimp_V3_Upgrade {
           }
         }
 
-        // update_post_meta( $product->ID, '_edd_mailchimp', array_unique( $settings ) );
+        update_post_meta( $product->ID, '_edd_mailchimp', array_unique( $settings ) );
 
-        // if ( ! empty( $selected_interests ) ) {
-        //   update_post_meta( $product->ID, '_edd_mailchimp_interests', $selected_interests);
-        // }
+        if ( ! empty( $selected_interests ) ) {
+          foreach ( $selected_interests as $list_id => $interests ) {
+            update_post_meta( $product->ID, '_edd_mailchimp_' . $list_id . '_interests', $interests );
+          }
+        }
       }
 
       $this->step++;
