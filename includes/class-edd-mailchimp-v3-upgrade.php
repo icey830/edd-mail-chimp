@@ -114,6 +114,8 @@ class EDD_MailChimp_V3_Upgrade {
         //   3 => string '097846e40a|19129|Invisible 3' (length=28)
         //   4 => string '33e84889b3' (length=10)
 
+        $selected_interests  = array();
+
         foreach ( $settings as $index => $list ) {
           if ( strpos( $list, '|' ) != FALSE ) {
 
@@ -132,7 +134,10 @@ class EDD_MailChimp_V3_Upgrade {
 
             // .. call mailchimp api and get this list's interest categories ..
             $interest_categories = $api->get( "lists/$list_id/interest-categories" );
-            $selected_interests  = array();
+
+            if ( ! isset( $selected_interests[$list_id] ) ) {
+              $selected_interests[$list_id] = array();
+            }
 
             if ( ! empty( $interest_categories['categories'] ) ) {
 
@@ -145,7 +150,7 @@ class EDD_MailChimp_V3_Upgrade {
               foreach ( $categories as $interest_category_id => $category ) {
                 foreach ( $category['interests'] as $interest ) {
                   if ( strtolower( $interest['name'] ) === strtolower( $interest_name ) ) {
-                    $selected_interests[$interest['id']] = TRUE;
+                    $selected_interests[$list_id][$interest['id']] = TRUE;
                   }
                 }
               }
