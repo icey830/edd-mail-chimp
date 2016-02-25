@@ -103,10 +103,6 @@ class EDD_MailChimp_V3_Upgrade {
 
         $settings = (array) get_post_meta( $product->ID, '_edd_mailchimp', true );
 
-        // DEV ONLY
-        $settings = array('097846e40a', '33e84889b3', '097846e40a|18033|Donating');
-        // DEV ONLY
-
         if ( empty( $settings) ) {
           continue;
         }
