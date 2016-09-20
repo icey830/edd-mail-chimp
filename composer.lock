@@ -9,19 +9,20 @@
     "packages": [
         {
             "name": "drewm/mailchimp-api",
-            "version": "v2.1",
+            "version": "v2.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/drewm/mailchimp-api.git",
-                "reference": "a9bf617afb5a9bcb2601f5cc23b01a7b581d5659"
+                "reference": "89b7dbc54b7ba8c2e249d6e63f66d22ecb8070f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/drewm/mailchimp-api/zipball/a9bf617afb5a9bcb2601f5cc23b01a7b581d5659",
-                "reference": "a9bf617afb5a9bcb2601f5cc23b01a7b581d5659",
+                "url": "https://api.github.com/repos/drewm/mailchimp-api/zipball/89b7dbc54b7ba8c2e249d6e63f66d22ecb8070f8",
+                "reference": "89b7dbc54b7ba8c2e249d6e63f66d22ecb8070f8",
                 "shasum": ""
             },
             "require": {
+                "ext-curl": "*",
                 "php": ">=5.3"
             },
             "require-dev": {
@@ -47,7 +48,7 @@
             ],
             "description": "Super-simple, minimum abstraction MailChimp API v3 wrapper",
             "homepage": "https://github.com/drewm/mailchimp-api",
-            "time": "2016-01-30 16:12:54"
+            "time": "2016-07-01 15:53:33"
         }
     ],
     "packages-dev": [],
