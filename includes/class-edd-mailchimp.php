@@ -7,6 +7,8 @@
  * @since       2.0
 */
 
+use \DrewM\MailChimp\MailChimp;
+
 class EDD_MailChimp extends EDD_Newsletter {
 
 	/**
