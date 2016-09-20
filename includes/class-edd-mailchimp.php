@@ -16,6 +16,7 @@ class EDD_MailChimp extends EDD_Newsletter {
 	 */
 	public function init() {
 		global $edd_options;
+
 		if( ! empty( $edd_options['eddmc_label'] ) ) {
 			$this->checkout_label = trim( $edd_options['eddmc_label'] );
 		} else {
@@ -24,7 +25,6 @@ class EDD_MailChimp extends EDD_Newsletter {
 
 		add_filter( 'edd_settings_sections_extensions', array( $this, 'subsection' ), 10, 1 );
 		add_filter( 'edd_settings_extensions_sanitize', array( $this, 'save_settings' ) );
-
 	}
 
 	/**
@@ -37,18 +37,19 @@ class EDD_MailChimp extends EDD_Newsletter {
 		if( ! empty( $edd_options['eddmc_api'] ) ) {
 
 			$list_data = get_transient( 'edd_mailchimp_list_data' );
+
 			if( false === $list_data ) {
 
-				$api       = new EDD_MailChimp_API( trim( $edd_options['eddmc_api'] ) );
-				$list_data = $api->call('lists/list', array( 'limit' => 100 ) );
+				$api       = new MailChimp( trim( $edd_options['eddmc_api'] ) );
+				$list_data = $api->get('lists', array( 'count' => 100 ) );
 
 				set_transient( 'edd_mailchimp_list_data', $list_data, 24*24*24 );
 			}
 
 			if( ! empty( $list_data ) ) {
-				foreach( $list_data->data as $key => $list ) {
+				foreach( $list_data['lists'] as $key => $list ) {
 
-					$this->lists[ $list->id ] = $list->name;
+					$this->lists[ $list['id'] ] = $list['name'];
 
 				}
 			}
