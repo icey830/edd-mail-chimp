@@ -1,8 +1,8 @@
 <?php
 /**
- * EDD MailChimp class, extension of the EDD base newsletter classs
+ * EDD MailChimp class, extension of the EDD base newsletter class
  *
- * @copyright   Copyright (c) 2013, Pippin Williamson
+ * @copyright   Copyright (c) 2016, Pippin Williamson, Dave Kiss
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       2.0
 */
