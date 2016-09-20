@@ -35,7 +35,11 @@ if( ! class_exists( 'EDD_Newsletter' ) ) {
 }
 
 if( ! class_exists( 'EDD_MailChimp' ) ) {
-	include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp.php' );
+  if ( edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
+    include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp.php' );
+  } else {
+    include( EDD_MAILCHIMP_PATH . '/includes/deprecated/class-edd-mailchimp.php' );
+  }
 }
 
 if( ! class_exists( 'EDD_MC_Ecommerce_360' ) ) {
