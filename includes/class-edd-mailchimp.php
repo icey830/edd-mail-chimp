@@ -1,6 +1,6 @@
 <?php
 /**
- * EDD Mail Chimp class, extension of the EDD base newsletter classs
+ * EDD MailChimp class, extension of the EDD base newsletter classs
  *
  * @copyright   Copyright (c) 2013, Pippin Williamson
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
@@ -111,7 +111,7 @@ class EDD_MailChimp extends EDD_Newsletter {
 	 *
 	 * @since  2.5.6
 	 * @param  array $sections The subsections
-	 * @return array           The subsections with Mailchimp added
+	 * @return array           The subsections with MailChimp added
 	 */
 	function subsection( $sections ) {
 		$sections['mailchimp'] = __( 'MailChimp', 'eddmc' );
@@ -127,14 +127,14 @@ class EDD_MailChimp extends EDD_Newsletter {
 		$eddmc_settings = array(
 			array(
 				'id'      => 'eddmc_settings',
-				'name'    => '<strong>' . __( 'Mail Chimp Settings', 'eddmc' ) . '</strong>',
-				'desc'    => __( 'Configure Mail Chimp Integration Settings', 'eddmc' ),
+				'name'    => '<strong>' . __( 'MailChimp Settings', 'eddmc' ) . '</strong>',
+				'desc'    => __( 'Configure MailChimp Integration Settings', 'eddmc' ),
 				'type'    => 'header'
 			),
 			array(
 				'id'      => 'eddmc_api',
-				'name'    => __( 'Mail Chimp API Key', 'eddmc' ),
-				'desc'    => __( 'Enter your Mail Chimp API key', 'eddmc' ),
+				'name'    => __( 'MailChimp API Key', 'eddmc' ),
+				'desc'    => __( 'Enter your MailChimp API key', 'eddmc' ),
 				'type'    => 'text',
 				'size'    => 'regular'
 			),

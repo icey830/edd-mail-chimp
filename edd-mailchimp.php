@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Easy Digital Downloads - Mail Chimp
+Plugin Name: Easy Digital Downloads - MailChimp
 Plugin URL: http://easydigitaldownloads.com/extension/mail-chimp
-Description: Include a Mail Chimp signup option with your Easy Digital Downloads checkout
+Description: Include a MailChimp signup option with your Easy Digital Downloads checkout
 Version: 2.5.6
 Author: Pippin Williamson
 Author URI: http://pippinsplugins.com
