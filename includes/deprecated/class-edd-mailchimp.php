@@ -35,6 +35,7 @@ class EDD_MailChimp extends EDD_Newsletter {
     if( ! empty( $edd_options['eddmc_api'] ) ) {
 
       $list_data = get_transient( 'edd_mailchimp_list_data' );
+
       if( false === $list_data ) {
 
         $api       = new EDD_MailChimp_API( trim( $edd_options['eddmc_api'] ) );
@@ -70,10 +71,6 @@ class EDD_MailChimp extends EDD_Newsletter {
       $grouping_data = get_transient( 'edd_mailchimp_groupings_' . $list_id );
 
       if( false === $grouping_data ) {
-
-        if( ! class_exists( 'EDD_MailChimp_API' ) ) {
-          require_once( EDD_MAILCHIMP_PATH . '/includes/MailChimp.class.php' );
-        }
 
         $api           = new EDD_MailChimp_API( trim( $edd_options['eddmc_api'] ) );
         $grouping_data = $api->call( 'lists/interest-groupings', array( 'id' => $list_id ) );
