@@ -53,7 +53,7 @@ class EDD_MailChimp {
 	 * Load the plugin's textdomain
 	 */
 	public function textdomain() {
-		load_plugin_textdomain( 'edd_mailchimp', false, EDD_MAILCHIMP_PATH . '/languages/' );
+		load_plugin_textdomain( 'eddmc', false, EDD_MAILCHIMP_PATH . '/languages/' );
 	}
 
 	/**
