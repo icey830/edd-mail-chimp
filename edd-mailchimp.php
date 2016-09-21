@@ -67,7 +67,7 @@ if ( ! class_exists( 'EDD_MC_Tools' ) && class_exists( 'Easy_Digital_Downloads' 
 	}
 }
 
-$edd_mc       = new EDD_MailChimp( 'mailchimp', 'Mail Chimp' );
+$edd_mc       = new EDD_MailChimp;
 $edd_mc360    = new EDD_MC_Ecommerce_360;
 
 if ( class_exists( 'EDD_MC_Tools' ) ) {

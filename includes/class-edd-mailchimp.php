@@ -161,12 +161,6 @@ class EDD_MailChimp extends EDD_Newsletter {
 				'type'    => 'text',
 				'size'    => 'regular'
 			),
-			array(
-				'id'      => 'eddmc_double_opt_in',
-				'name'    => __( 'Double Opt-In', 'eddmc' ),
-				'desc'    => __( 'When checked, users will be sent a confirmation email after signing up, and will only be added once they have confirmed the subscription.', 'eddmc' ),
-				'type'    => 'checkbox'
-			)
 		);
 
 		if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
@@ -256,7 +250,5 @@ class EDD_MailChimp extends EDD_Newsletter {
 		}
 
 		return false;
-
 	}
-
 }
