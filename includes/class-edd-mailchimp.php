@@ -58,11 +58,114 @@ class EDD_MailChimp {
 
 
 	/**
+	 * Register our subsection for EDD 2.5
+	 *
+	 * @since  2.5.6
+	 * @param  array $sections The subsections
+	 * @return array           The subsections with MailChimp added
+	 */
+	public function subsection( $sections ) {
+		$sections['mailchimp'] = __( 'MailChimp', 'eddmc' );
+		return $sections;
+	}
+
+
+	/**
+	 * Registers the plugin settings
+	 */
+	public function settings( $settings ) {
+
+		$eddmc_settings = array(
+			array(
+				'id'      => 'eddmc_settings',
+				'name'    => '<strong>' . __( 'MailChimp Settings', 'eddmc' ) . '</strong>',
+				'desc'    => __( 'Configure MailChimp Integration Settings', 'eddmc' ),
+				'type'    => 'header'
+			),
+			array(
+				'id'      => 'eddmc_api',
+				'name'    => __( 'MailChimp API Key', 'eddmc' ),
+				'desc'    => __( 'Enter your MailChimp API key', 'eddmc' ),
+				'type'    => 'text',
+				'size'    => 'regular'
+			),
+			array(
+				'id'      => 'eddmc_show_checkout_signup',
+				'name'    => __( 'Show Signup on Checkout', 'eddmc' ),
+				'desc'    => __( 'Allow customers to signup for the list selected below during checkout?', 'eddmc' ),
+				'type'    => 'checkbox'
+			),
+			array(
+				'id'      => 'eddmc_list',
+				'name'    => __( 'Choose a list', 'edda'),
+				'desc'    => __( 'Select the list you wish to subscribe buyers to', 'eddmc' ),
+				'type'    => 'select',
+				'options' => $this->_get_lists()
+			),
+			array(
+				'id'      => 'eddmc_label',
+				'name'    => __( 'Checkout Label', 'eddmc' ),
+				'desc'    => __( 'This is the text shown next to the signup option', 'eddmc' ),
+				'type'    => 'text',
+				'size'    => 'regular'
+			),
+		);
+
+		if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
+			$eddmc_settings = array( 'mailchimp' => $eddmc_settings );
+		}
+
+		return array_merge( $settings, $eddmc_settings );
+	}
+
+
+	/**
+	 * Flush the list transient on save
+	 */
+	public function save_settings( $input ) {
+		if( isset( $input['eddmc_api'] ) ) {
+			delete_transient( 'edd_mailchimp_list_data' );
+		}
+		return $input;
+	}
+
+
+	/**
 	 * Register the metabox on the 'download' post type
 	 */
 	public function add_metabox() {
 		if ( current_user_can( 'edit_product', get_the_ID() ) ) {
 			add_meta_box( 'edd_mailchimp', 'MailChimp', array( $this, 'render_metabox' ), 'download', 'side' );
+		}
+	}
+
+
+	/**
+	 * Display the metabox, which is a list of newsletter lists
+	 */
+	public function render_metabox() {
+
+		global $post;
+
+		echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing.', 'eddmc' ) . '</p>';
+
+		$checked = (array) get_post_meta( $post->ID, '_edd_mailchimp', true );
+
+		foreach( $this->_get_lists() as $list_id => $list_name ) {
+			echo '<label>';
+				echo '<input type="checkbox" name="_edd_mailchimp' . '[]" value="' . esc_attr( $list_id ) . '"' . checked( true, in_array( $list_id, $checked ), false ) . '>';
+				echo '&nbsp;' . $list_name;
+			echo '</label><br/>';
+
+			$interests = $this->_get_interests( $list_id );
+			if( ! empty( $interests ) ) {
+				foreach ( $interests as $group_id => $group_name ){
+					echo '<label>';
+						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="_edd_mailchimp_interests["'. $list_id .'"]" value="' . esc_attr( $group_id ) . '"' . checked( true, in_array( $group_id, $checked ), false ) . '>';
+						echo '&nbsp;' . $group_name;
+					echo '</label><br/>';
+				}
+			}
 		}
 	}
 
@@ -77,17 +180,6 @@ class EDD_MailChimp {
 		$fields[] = '_edd_mailchimp';
 		$fields[] = '_edd_mailchimp_interests';
 		return $fields;
-	}
-
-
-	/**
-	 * Flush the list transient on save
-	 */
-	public function save_settings( $input ) {
-		if( isset( $input['eddmc_api'] ) ) {
-			delete_transient( 'edd_mailchimp_list_data' );
-		}
-		return $input;
 	}
 
 
@@ -157,6 +249,50 @@ class EDD_MailChimp {
 
 
 	/**
+	 * Subscribe an email to a list
+	 *
+	 * @param  array   $user_info       Customer data containing the user ID, email, first name, and last name
+	 * @param  boolean $list_id         MailChimp List ID to subscribe the user to
+	 * @param  boolean $opt_in_override false (deprecated)
+	 * @return boolean                  Was the customer subscribed?
+	 */
+	public function subscribe_email( $user_info = array(), $list_id = false, $opt_in_override = false ) {
+
+		// Make sure an API key has been entered
+		if( empty( $this->api ) ) {
+			return false;
+		}
+
+		// Retrieve the global list ID if none is provided
+		if( ! $list_id ) {
+			$global_list_id = edd_get_option('eddmc_list');
+			$list_id = ! empty( $global_list_id ) ? $global_list_id : false;
+			if( ! $list_id ) {
+				return false;
+			}
+		}
+
+		$merge_fields = array( 'FNAME' => $user_info['first_name'], 'LNAME' => $user_info['last_name'] );
+
+		// todo: get interests for this list here
+		//
+		// $interests = array( 'unique_interest_id' => true );
+		$result = $this->api->post("lists/$list_id/members", apply_filters( 'edd_mc_subscribe_vars', array(
+			'email_address' => $user_info['email'],
+			'status'        => 'subscribed',
+			'merge_fields'  => $merge_fields,
+			'interests'     => $interests,
+		) ) );
+
+		if( $result ) {
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
 	 * Retrieve the MailChimp lists
 	 *
 	 * Must return an array like this:
@@ -165,7 +301,7 @@ class EDD_MailChimp {
 	 *     'other_id' => 'value2'
 	 *   )
 	 */
-	public function get_lists() {
+	private function _get_lists() {
 		$lists = array();
 
 		$list_data = get_transient( 'edd_mailchimp_list_data' );
@@ -191,7 +327,7 @@ class EDD_MailChimp {
 	* @param  string $list_id       List id for which categories should be returned
 	* @return array  $category_data Data about the category
 	*/
-	public function get_interests( $list_id = '' ) {
+	private function _get_interests( $list_id = '' ) {
 
 		global $post;
 
@@ -237,146 +373,10 @@ class EDD_MailChimp {
 
 
 	/**
-	 * Display the metabox, which is a list of newsletter lists
-	 */
-	public function render_metabox() {
-
-		global $post;
-
-		echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing.', 'eddmc' ) . '</p>';
-
-		$checked = (array) get_post_meta( $post->ID, '_edd_mailchimp', true );
-
-		foreach( $this->get_lists() as $list_id => $list_name ) {
-			echo '<label>';
-				echo '<input type="checkbox" name="_edd_mailchimp' . '[]" value="' . esc_attr( $list_id ) . '"' . checked( true, in_array( $list_id, $checked ), false ) . '>';
-				echo '&nbsp;' . $list_name;
-			echo '</label><br/>';
-
-			$interests = $this->get_interests( $list_id );
-			if( ! empty( $interests ) ) {
-				foreach ( $interests as $group_id => $group_name ){
-					echo '<label>';
-						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="_edd_mailchimp_interests["'. $list_id .'"]" value="' . esc_attr( $group_id ) . '"' . checked( true, in_array( $group_id, $checked ), false ) . '>';
-						echo '&nbsp;' . $group_name;
-					echo '</label><br/>';
-				}
-			}
-		}
-	}
-
-
-	/**
-	 * Register our subsection for EDD 2.5
-	 *
-	 * @since  2.5.6
-	 * @param  array $sections The subsections
-	 * @return array           The subsections with MailChimp added
-	 */
-	public function subsection( $sections ) {
-		$sections['mailchimp'] = __( 'MailChimp', 'eddmc' );
-		return $sections;
-	}
-
-
-	/**
-	 * Registers the plugin settings
-	 */
-	public function settings( $settings ) {
-
-		$eddmc_settings = array(
-			array(
-				'id'      => 'eddmc_settings',
-				'name'    => '<strong>' . __( 'MailChimp Settings', 'eddmc' ) . '</strong>',
-				'desc'    => __( 'Configure MailChimp Integration Settings', 'eddmc' ),
-				'type'    => 'header'
-			),
-			array(
-				'id'      => 'eddmc_api',
-				'name'    => __( 'MailChimp API Key', 'eddmc' ),
-				'desc'    => __( 'Enter your MailChimp API key', 'eddmc' ),
-				'type'    => 'text',
-				'size'    => 'regular'
-			),
-			array(
-				'id'      => 'eddmc_show_checkout_signup',
-				'name'    => __( 'Show Signup on Checkout', 'eddmc' ),
-				'desc'    => __( 'Allow customers to signup for the list selected below during checkout?', 'eddmc' ),
-				'type'    => 'checkbox'
-			),
-			array(
-				'id'      => 'eddmc_list',
-				'name'    => __( 'Choose a list', 'edda'),
-				'desc'    => __( 'Select the list you wish to subscribe buyers to', 'eddmc' ),
-				'type'    => 'select',
-				'options' => $this->get_lists()
-			),
-			array(
-				'id'      => 'eddmc_label',
-				'name'    => __( 'Checkout Label', 'eddmc' ),
-				'desc'    => __( 'This is the text shown next to the signup option', 'eddmc' ),
-				'type'    => 'text',
-				'size'    => 'regular'
-			),
-		);
-
-		if ( version_compare( EDD_VERSION, 2.5, '>=' ) ) {
-			$eddmc_settings = array( 'mailchimp' => $eddmc_settings );
-		}
-
-		return array_merge( $settings, $eddmc_settings );
-	}
-
-
-
-	/**
 	 * Determines if the checkout signup option should be displayed
 	 */
 	private static function _show_checkout_signup() {
 		$show = edd_get_option('eddmc_show_checkout_signup');
 		return ! empty( $show );
-	}
-
-	/**
-	 * Subscribe an email to a list
-	 *
-	 * @param  array   $user_info       Customer data containing the user ID, email, first name, and last name
-	 * @param  boolean $list_id         MailChimp List ID to subscribe the user to
-	 * @param  boolean $opt_in_override false (deprecated)
-	 * @return boolean                  Was the customer subscribed?
-	 */
-	public function subscribe_email( $user_info = array(), $list_id = false, $opt_in_override = false ) {
-
-		// Make sure an API key has been entered
-		if( empty( $this->api ) ) {
-			return false;
-		}
-
-		// Retrieve the global list ID if none is provided
-		if( ! $list_id ) {
-			$global_list_id = edd_get_option('eddmc_list');
-			$list_id = ! empty( $global_list_id ) ? $global_list_id : false;
-			if( ! $list_id ) {
-				return false;
-			}
-		}
-
-		$merge_fields = array( 'FNAME' => $user_info['first_name'], 'LNAME' => $user_info['last_name'] );
-
-		// todo: get interests for this list here
-		//
-		// $interests = array( 'unique_interest_id' => true );
-		$result = $this->api->post("lists/$list_id/members", apply_filters( 'edd_mc_subscribe_vars', array(
-			'email_address' => $user_info['email'],
-			'status'        => 'subscribed',
-			'merge_fields'  => $merge_fields,
-			'interests'     => $interests,
-		) ) );
-
-		if( $result ) {
-			return true;
-		}
-
-		return false;
 	}
 }
