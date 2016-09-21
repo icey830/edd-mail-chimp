@@ -56,6 +56,41 @@ class EDD_MailChimp {
 		load_plugin_textdomain( 'eddmc', false, EDD_MAILCHIMP_PATH . '/languages/' );
 	}
 
+
+	/**
+	 * Register the metabox on the 'download' post type
+	 */
+	public function add_metabox() {
+		if ( current_user_can( 'edit_product', get_the_ID() ) ) {
+			add_meta_box( 'edd_mailchimp', 'MailChimp', array( $this, 'render_metabox' ), 'download', 'side' );
+		}
+	}
+
+
+	/**
+	 * Add metabox fields that should be saved to the post meta
+	 *
+	 * @param  array $fields
+	 * @return array
+	 */
+	public function save_metabox( $fields ) {
+		$fields[] = '_edd_mailchimp';
+		$fields[] = '_edd_mailchimp_interests';
+		return $fields;
+	}
+
+
+	/**
+	 * Flush the list transient on save
+	 */
+	public function save_settings( $input ) {
+		if( isset( $input['eddmc_api'] ) ) {
+			delete_transient( 'edd_mailchimp_list_data' );
+		}
+		return $input;
+	}
+
+
 	/**
 	 * Output the signup checkbox on the checkout screen, if enabled
 	 */
@@ -119,16 +154,6 @@ class EDD_MailChimp {
 
 		foreach( $lists as $list ) {
 			$this->subscribe_email( $user_info, $list );
-		}
-	}
-
-
-	/**
-	 * Register the metabox on the 'download' post type
-	 */
-	public function add_metabox() {
-		if ( current_user_can( 'edit_product', get_the_ID() ) ) {
-			add_meta_box( 'edd_mailchimp', 'MailChimp', array( $this, 'render_metabox' ), 'download', 'side' );
 		}
 	}
 
@@ -242,18 +267,6 @@ class EDD_MailChimp {
 		}
 	}
 
-	/**
-	 * Add metabox fields that should be saved to the post meta
-	 *
-	 * @param  array $fields
-	 * @return array
-	 */
-	public function save_metabox( $fields ) {
-		$fields[] = '_edd_mailchimp';
-		$fields[] = '_edd_mailchimp_interests';
-		return $fields;
-	}
-
 
 	/**
 	 * Register our subsection for EDD 2.5
@@ -316,15 +329,7 @@ class EDD_MailChimp {
 		return array_merge( $settings, $eddmc_settings );
 	}
 
-	/**
-	 * Flush the list transient on save
-	 */
-	public function save_settings( $input ) {
-		if( isset( $input['eddmc_api'] ) ) {
-			delete_transient( 'edd_mailchimp_list_data' );
-		}
-		return $input;
-	}
+
 
 	/**
 	 * Determines if the checkout signup option should be displayed
