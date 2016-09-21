@@ -115,8 +115,6 @@ class EDD_MailChimp {
 	 * Check if a customer needs to be subscribed at checkout
 	 */
 	public function checkout_signup( $posted, $user_info, $valid_data ) {
-
-		// Check for global newsletter
 		if( isset( $posted['edd_mailchimp_signup'] ) ) {
 			$this->subscribe_email( $user_info );
 		}
