@@ -51,8 +51,9 @@ class EDD_MailChimp_V3_Upgrade {
    * @return [type] [description]
    */
   public function show_upgrade_notices() {
-    if ( isset( $_GET['page'] ) && $_GET['page'] == 'edd-upgrades' )
+    if ( isset( $_GET['page'] ) && $_GET['page'] == 'edd-upgrades' ) {
       return; // Don't show notices on the upgrades page
+    }
 
 
 
@@ -279,6 +280,7 @@ class EDD_MailChimp_V3_Upgrade {
     edd_set_upgrade_complete( 'upgrade_mailchimp_groupings_settings' );
     delete_option( 'edd_doing_upgrade' );
   }
+
 
   /**
    * Redirect the user to the appropriate page based on the next
