@@ -95,7 +95,7 @@ class EDD_MailChimp {
 	 * Output the signup checkbox on the checkout screen, if enabled
 	 */
 	public function checkout_fields() {
-		if( ! $this->show_checkout_signup() ) {
+		if( ! self::_show_checkout_signup() ) {
 			return;
 		}
 
@@ -334,7 +334,7 @@ class EDD_MailChimp {
 	/**
 	 * Determines if the checkout signup option should be displayed
 	 */
-	public function show_checkout_signup() {
+	private static function _show_checkout_signup() {
 		$show = edd_get_option('eddmc_show_checkout_signup');
 		return ! empty( $show );
 	}
