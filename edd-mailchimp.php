@@ -31,11 +31,13 @@ if ( class_exists( 'EDD_License' ) && is_admin() ) {
   $eddmc_license = new EDD_License( __FILE__, EDD_MAILCHIMP_PRODUCT_NAME, '2.5.6', 'Pippin Williamson' );
 }
 
-if ( edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
 
+
+if ( edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
   // Use the new MailChimp class
   if( ! class_exists( 'EDD_MailChimp' ) ) {
     include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp.php' );
+    $edd_mc = new EDD_MailChimp;
   }
 
 } else {
@@ -53,6 +55,7 @@ if ( edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
 
   if( ! class_exists( 'EDD_MailChimp' ) ) {
     include( EDD_MAILCHIMP_PATH . '/includes/deprecated/class-edd-mailchimp.php' );
+    $edd_mc = new EDD_MailChimp('mailchimp', 'MailChimp');
   }
 }
 
@@ -67,7 +70,6 @@ if ( ! class_exists( 'EDD_MC_Tools' ) && class_exists( 'Easy_Digital_Downloads' 
 	}
 }
 
-$edd_mc       = new EDD_MailChimp;
 $edd_mc360    = new EDD_MC_Ecommerce_360;
 
 if ( class_exists( 'EDD_MC_Tools' ) ) {
