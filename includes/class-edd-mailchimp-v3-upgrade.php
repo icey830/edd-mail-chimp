@@ -55,28 +55,12 @@ class EDD_MailChimp_V3_Upgrade {
       return; // Don't show notices on the upgrades page
     }
 
-
-
-      // DEV ONLY
-      $completed_upgrades = get_option( 'edd_completed_upgrades' );
-
-      foreach ($completed_upgrades as $i => $value) {
-        if ($value == 'upgrade_mailchimp_groupings_settings') {
-          unset($completed_upgrades[$i]);
-        }
-      }
-
-      update_option( 'edd_completed_upgrades', $completed_upgrades );
-      // DEV ONLY
-
-
-
-      if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
-        printf(
-          '<div class="updated"><p>' . __( 'Easy Digital Downloads needs to upgrade your MailChimp settings, click <a href="%s">here</a> to start the upgrade.', 'easy-digital-downloads' ) . '</p></div>',
-          esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_mailchimp_groupings_settings' ) )
-        );
-      }
+    if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
+      printf(
+        '<div class="updated"><p>' . __( 'Easy Digital Downloads needs to upgrade your MailChimp settings, click <a href="%s">here</a> to start the upgrade.', 'easy-digital-downloads' ) . '</p></div>',
+        esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_mailchimp_groupings_settings' ) )
+      );
+    }
   }
 
 
