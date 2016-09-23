@@ -337,38 +337,34 @@ class EDD_MailChimp {
 		global $post;
 
 		$settings = (array) get_post_meta( $post->ID, '_edd_mailchimp', true );
+		$category_data = array();
 
-		if( ! empty( $this->api ) ) {
+		// Uncomment for testing only:
+		// delete_transient('edd_mailchimp_interest_categories_' . $list_id);
 
-			// Uncomment for testing only:
-			// delete_transient('edd_mailchimp_interest_categories_' . $list_id);
+		$interest_categories = get_transient( 'edd_mailchimp_interest_categories_' . $list_id );
 
-			$interest_categories = get_transient( 'edd_mailchimp_interest_categories_' . $list_id );
+		if( false === $interest_categories && ! empty( $this->api ) ) {
+			$interest_categories = $this->api->get( "lists/$list_id/interest-categories" );
+			set_transient( 'edd_mailchimp_interest_categories_' . $list_id, $interest_categories, 24*24*24 );
+		}
 
-			if( false === $interest_categories ) {
-				$interest_categories = $this->api->get( "lists/$list_id/interest-categories" );
-				set_transient( 'edd_mailchimp_interest_categories_' . $list_id, $interest_categories, 24*24*24 );
-			}
+		if( $interest_categories && ! empty( $interest_categories['categories'] ) ) {
 
-			$category_data = array();
+			foreach( $interest_categories['categories'] as $category ) {
 
-			if( $interest_categories && ! empty( $interest_categories['categories'] ) ) {
+				$category_id   = $category['id'];
+				$category_name = $category['title'];
 
-				foreach( $interest_categories['categories'] as $category ) {
+				$interests = $this->api->get( "lists/$list_id/interest-categories/$category_id/interests" );
 
-					$category_id   = $category['id'];
-					$category_name = $category['title'];
+				if ( $interests && ! empty( $interests['interests'] ) ) {
+					foreach ( $interests['interests'] as $interest ) {
+						$interest_id   = $interest['id'];
+						$interest_name = $interest['name'];
 
-					$interests = $this->api->get( "lists/$list_id/interest-categories/$category_id/interests" );
-
-					if ( $interests && ! empty( $interests['interests'] ) ) {
-						foreach ( $interests['interests'] as $interest ) {
-							$interest_id   = $interest['id'];
-							$interest_name = $interest['name'];
-						}
+						$category_data["$list_id|$interest_id"] = $category_name . ' - ' . $interest_name;
 					}
-
-					$category_data["$list_id|$interest_id"] = $category_name . ' - ' . $interest_name;
 				}
 			}
 		}
