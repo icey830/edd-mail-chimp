@@ -282,10 +282,11 @@ class EDD_MailChimp {
 	 *
 	 * @param  array   $user_info       Customer data containing the user ID, email, first name, and last name
 	 * @param  boolean $list_id         MailChimp List ID to subscribe the user to
-	 * @param  boolean $opt_in_override false (deprecated)
+	 * @param  boolean $opt_in_override Should we force double opt-in for this subscription?
+	 * @param  boolean $options         Additional subscription options
 	 * @return boolean                  Was the customer subscribed?
 	 */
-	public function subscribe_email( $user_info = array(), $list_id = false, $opt_in_override = false ) {
+	public function subscribe_email( $user_info = array(), $list_id = false, $opt_in_override = false, $options = array() ) {
 
 		// Make sure an API key has been entered
 		if( empty( $this->api ) ) {
@@ -301,14 +302,20 @@ class EDD_MailChimp {
 			}
 		}
 
-		$merge_fields = array( 'FNAME' => $user_info['first_name'], 'LNAME' => $user_info['last_name'] );
+		$opt_in = edd_get_option('eddmc_double_opt_in');
 
-		// todo: get interests for this list here
-		//
-		// $interests = array( 'unique_interest_id' => true );
+		if ( $opt_in_override ) {
+			$opt_in = TRUE;
+		}
+
+		$status = $opt_in ? 'pending' : 'subscribed';
+
+		$merge_fields = array( 'FNAME' => $user_info['first_name'], 'LNAME' => $user_info['last_name'] );
+		$interests = isset( $options['interests'] ) ? $options['interests'] : array();
+
 		$result = $this->api->post("lists/$list_id/members", apply_filters( 'edd_mc_subscribe_vars', array(
 			'email_address' => $user_info['email'],
-			'status'        => 'subscribed',
+			'status'        => $status,
 			'merge_fields'  => $merge_fields,
 			'interests'     => $interests,
 		) ) );
