@@ -165,10 +165,10 @@ class EDD_MailChimp {
 
 			$interests = $this->_get_interests( $list_id );
 			if( ! empty( $interests ) ) {
-				foreach ( $interests as $group_id => $group_name ){
+				foreach ( $interests as $interest_id => $interest_name ){
 					echo '<label>';
-						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="_edd_mailchimp_interests["'. $list_id .'"]" value="' . esc_attr( $group_id ) . '"' . checked( true, in_array( $group_id, $checked ), false ) . '>';
-						echo '&nbsp;' . $group_name;
+						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="_edd_mailchimp[]" value="' . esc_attr( $interest_id ) . '"' . checked( true, in_array( $interest_id, $checked ), false ) . '>';
+						echo '&nbsp;' . $interest_name;
 					echo '</label><br/>';
 				}
 			}
@@ -184,7 +184,6 @@ class EDD_MailChimp {
 	 */
 	public function save_metabox( $fields ) {
 		$fields[] = '_edd_mailchimp';
-		$fields[] = '_edd_mailchimp_interests';
 		return $fields;
 	}
 
