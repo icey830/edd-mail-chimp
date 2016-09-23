@@ -43,7 +43,7 @@ class EDD_MailChimp {
 		add_filter( 'edd_settings_extensions', array( $this, 'settings' ) );
 		add_action( 'edd_purchase_form_before_submit', array( $this, 'checkout_fields' ), 100 );
 		add_action( 'edd_checkout_before_gateway', array( $this, 'checkout_signup' ), 10, 3 );
-		add_action( 'edd_complete_download_purchase', array( $this, 'completed_download_purchase_signup' ), 10, 3 );
+		add_action( 'edd_complete_download_purchase', array( $this, 'hook_signup' ), 10, 3 );
 
 		add_filter( 'edd_settings_sections_extensions', array( $this, 'subsection' ), 10, 1 );
 		add_filter( 'edd_settings_extensions_sanitize', array( $this, 'save_settings' ) );
@@ -217,38 +217,62 @@ class EDD_MailChimp {
 		}
 	}
 
+	/**
+	 * Backwards compatibility to add an action for signups
+	 * through the edd_complete_download_purchase action
+	 */
+	public function hook_signup() {
+		add_action( 'edd_complete_purchase', array( $this, 'completed_purchase_signup' ) );
+	}
 
 	/**
 	 * Check if a customer needs to be subscribed on completed purchase of specific products
 	 */
-	public function completed_download_purchase_signup( $download_id = 0, $payment_id = 0, $download_type = 'default' ) {
+	public function completed_purchase_signup( $payment_id = 0 ) {
 
 		$user_info = edd_get_payment_meta_user_info( $payment_id );
-		$lists     = get_post_meta( $download_id, '_edd_mailchimp', true );
+		$downloads = edd_get_payment_meta_cart_details( $payment_id, true );
 
-		if( 'bundle' == $download_type ) {
+		$entries = array();
 
-			// Get the lists of all items included in the bundle
+		foreach ( $downloads as $download ) {
+			$download_lists = get_post_meta( $download['id'], '_edd_mailchimp', true );
 
-			$downloads = edd_get_bundled_products( $download_id );
-			if( $downloads ) {
-				foreach( $downloads as $d_id ) {
-					$d_lists = get_post_meta( $d_id, '_edd_mailchimp', true );
-					if ( is_array( $d_lists ) ) {
-						$lists = array_merge( $d_lists, (array) $lists );
-					}
-				}
+			if ( is_array( $download_lists ) ) {
+				$entries = array_merge( $download_lists, $entries );
 			}
 		}
 
-		if( empty( $lists ) ) {
+		if( empty( $entries ) ) {
 			return;
 		}
 
-		$lists = array_unique( $lists );
+		$entries = array_unique( $entries );
 
-		foreach( $lists as $list ) {
-			$this->subscribe_email( $user_info, $list );
+		// Convert, combine and break out any interests into lists and interest array
+		$lists = array();
+
+		foreach( $entries as $list ) {
+
+			if ( strpos( $list, '|' ) != FALSE ) {
+				$parts          = explode( '|', $list );
+				$list_id        = $parts[0];
+				$interest_id    = $parts[1];
+			} else {
+				$list_id = $list;
+			}
+
+			if ( ! isset( $lists[$list_id] ) ) {
+				$lists[$list_id] = array();
+			}
+
+			if ( isset( $interest_id ) ) {
+				$lists[$list_id][$interest_id] = TRUE;
+			}
+		}
+
+		foreach( $lists as $list => $interests ) {
+			$this->subscribe_email( $user_info, $list, false, array('interests' => $interests) );
 		}
 	}
 
