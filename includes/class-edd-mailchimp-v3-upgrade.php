@@ -92,27 +92,31 @@ class EDD_MailChimp_V3_Upgrade {
           continue;
         }
 
-        // array (size=5)
-        //   0 => string '097846e40a' (length=10)
-        //   1 => string '097846e40a|18033|Donating' (length=25)
-        //   2 => string '097846e40a|18033|Events' (length=23)
-        //   3 => string '097846e40a|19129|Invisible 3' (length=28)
-        //   4 => string '33e84889b3' (length=10)
-
-        $selected_interests  = array();
+        $converted  = array();
 
         foreach ( $settings as $index => $list ) {
           if ( strpos( $list, '|' ) != FALSE ) {
 
             // This is an old style setting for MailChimp API v2,
-            // so we need to convert here.
+            // so we need to convert here. $list may look like any
+            // of the following entries:
+            //
+            // array (size=5)
+            //   0 => string '097846e40a' (length=10)
+            //   1 => string '097846e40a|18033|Donating' (length=25)
+            //   2 => string '097846e40a|18033|Events' (length=23)
+            //   3 => string '097846e40a|19129|Invisible 3' (length=28)
+            //   4 => string '33e84889b3' (length=10)
             //
             // Since MailChimp doesn't allow looking up interest categories by the
-            // group ID that we previously stored, we need to get all of our groups using the v2 api
-            // and compare them to our group names from v3.
+            // group ID that we previously stored, we need to fetch them all and
+            // store the Interest ID if the stored name matches the interest name.
             //
-            // Format is this:
+            // Our old format is as follows:
             // $groups_data["$list_id|$grouping_id|$group_name"] = $grouping_name . ' - ' . $group_name;
+            //
+            // Grouping ID => Interest Category ID
+            // Group Name  => Interest name
             $parts          = explode( '|', $list );
             $list_id        = $parts[0];
             $interest_name  = $parts[2];
@@ -120,10 +124,8 @@ class EDD_MailChimp_V3_Upgrade {
             // .. call mailchimp api and get this list's interest categories ..
             $interest_categories = $api->get( "lists/$list_id/interest-categories" );
 
-            if ( ! isset( $selected_interests[$list_id] ) ) {
-              $selected_interests[$list_id] = array();
-            }
-
+            // If interest categories are present, fetch the interests
+            // that are children of each category.
             if ( ! empty( $interest_categories['categories'] ) ) {
 
               $categories = array();
@@ -132,26 +134,27 @@ class EDD_MailChimp_V3_Upgrade {
                 $categories[$interest_category['id']] = $api->get( "lists/$list_id/interest-categories/".$interest_category['id']."/interests" );
               }
 
-              foreach ( $categories as $interest_category_id => $category ) {
-                foreach ( $category['interests'] as $interest ) {
+              // Compare the interest name to the stored group name
+              // If they are the same, migrate that over to the new post meta.
+              foreach ( $categories as $interest_category_id => $interests ) {
+                foreach ( $interests['interests'] as $interest ) {
                   if ( strtolower( $interest['name'] ) === strtolower( $interest_name ) ) {
-                    $selected_interests[$list_id][$interest['id']] = TRUE;
+                    $converted[] = sprintf('%1$s|%2$s', $list_id, $interest['id']);
                   }
                 }
               }
             }
 
-            $settings[$index] = $list_id;
+            // Store the list ID
+            $converted[] = $list_id;
+            delete_transient( 'edd_mailchimp_groupings_' . $list_id);
+          } else {
+            $converted[] = $list;
+            delete_transient( 'edd_mailchimp_groupings_' . $list);
           }
         }
 
-        update_post_meta( $product->ID, '_edd_mailchimp', array_unique( $settings ) );
-
-        if ( ! empty( $selected_interests ) ) {
-          foreach ( $selected_interests as $list_id => $interests ) {
-            update_post_meta( $product->ID, '_edd_mailchimp_' . $list_id . '_interests', $interests );
-          }
-        }
+        update_post_meta( $product->ID, '_edd_mailchimp', array_unique( $converted ) );
       }
 
       $this->step++;
@@ -166,6 +169,8 @@ class EDD_MailChimp_V3_Upgrade {
     } else {
 
       // No more products found, finish up
+
+      delete_transient( 'edd_mailchimp_list_data' );
       self::mark_as_complete();
       self::redirect( admin_url() );
     }
