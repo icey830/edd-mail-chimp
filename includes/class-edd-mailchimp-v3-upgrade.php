@@ -92,8 +92,8 @@ class EDD_MailChimp_V3_Upgrade {
     self::authenticate_action();
     self::configure_php_settings();
 
-    global $edd_options;
-    $api = new MailChimp( trim( $edd_options['eddmc_api'] ) );
+    $key = edd_get_option('eddmc_api');
+    $api = new MailChimp( trim( $key ) );
 
     $this->step();
     $this->products();
@@ -208,9 +208,9 @@ class EDD_MailChimp_V3_Upgrade {
    * @return bool
    */
   private function authenticate_action() {
-    global $edd_options;
+    $key = edd_get_option('eddmc_api');
 
-    if ( empty( $edd_options['eddmc_api'] ) ) {
+    if ( empty( $key ) ) {
       wp_die( __( 'Please make sure to set your MailChimp API key on the Easy Digital Downloads extension settings page and try running this upgrade again.', 'eddmc' ), __( 'Error', 'easy-digital-downloads' ), array( 'response' => 403 ) );
     }
 
