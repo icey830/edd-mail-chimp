@@ -313,12 +313,14 @@ class EDD_MailChimp {
 		$merge_fields = array( 'FNAME' => $user_info['first_name'], 'LNAME' => $user_info['last_name'] );
 		$interests = isset( $options['interests'] ) ? $options['interests'] : array();
 
-		$result = $this->api->post("lists/$list_id/members", apply_filters( 'edd_mc_subscribe_vars', array(
+		$subscriber_hash = $this->api->subscriberHash( $user_info['email'] );
+
+		$result = $this->api->put("lists/$list_id/members/$subscriber_hash", apply_filters( 'edd_mc_subscribe_vars', array(
 			'email_address' => $user_info['email'],
-			'status'        => $status,
+			'status_if_new' => $status,
 			'merge_fields'  => $merge_fields,
 			'interests'     => $interests,
-		) ) );
+		) ));
 
 		if( $result ) {
 			return true;
