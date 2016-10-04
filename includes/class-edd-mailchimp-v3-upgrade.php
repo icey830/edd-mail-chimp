@@ -57,7 +57,7 @@ class EDD_MailChimp_V3_Upgrade {
 
     if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
       printf(
-        '<div class="updated"><p>' . __( 'Easy Digital Downloads needs to upgrade your MailChimp settings, click <a href="%s">here</a> to start the upgrade.', 'easy-digital-downloads' ) . '</p></div>',
+        '<div class="updated"><p>' . __( 'Easy Digital Downloads needs to upgrade your MailChimp settings, click <a href="%s">here</a> to start the upgrade.', 'eddmc' ) . '</p></div>',
         esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_mailchimp_groupings_settings' ) )
       );
     }
@@ -184,7 +184,7 @@ class EDD_MailChimp_V3_Upgrade {
    */
   private function authorize_action() {
     if ( ! current_user_can( 'manage_shop_settings' ) ) {
-      wp_die( __( 'You do not have permission to do shop upgrades', 'easy-digital-downloads' ), __( 'Error', 'easy-digital-downloads' ), array( 'response' => 403 ) );
+      wp_die( __( 'You do not have permission to do shop upgrades', 'eddmc' ), __( 'Error', 'eddmc' ), array( 'response' => 403 ) );
     }
 
     return true;
@@ -200,7 +200,7 @@ class EDD_MailChimp_V3_Upgrade {
     $key = edd_get_option('eddmc_api');
 
     if ( empty( $key ) ) {
-      wp_die( __( 'Please make sure to set your MailChimp API key on the Easy Digital Downloads extension settings page and try running this upgrade again.', 'eddmc' ), __( 'Error', 'easy-digital-downloads' ), array( 'response' => 403 ) );
+      wp_die( __( 'Please make sure to set your MailChimp API key on the Easy Digital Downloads extension settings page and try running this upgrade again.', 'eddmc' ), __( 'Error', 'eddmc' ), array( 'response' => 403 ) );
     }
 
     return true;

@@ -128,7 +128,7 @@ class EDD_Batch_Mailchimp_Ecommerce extends EDD_Batch_Export {
 	public function process_step() {
 
 		if ( ! $this->can_export() ) {
-			wp_die( __( 'You do not have permission to export data.', 'edd' ), __( 'Error', 'edd' ), array( 'response' => 403 ) );
+			wp_die( __( 'You do not have permission to export data.', 'eddmc' ), __( 'Error', 'eddmc' ), array( 'response' => 403 ) );
 		}
 
 		$rows = $this->send_data();
