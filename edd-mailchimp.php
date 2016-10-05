@@ -9,6 +9,14 @@ Author URI: http://pippinsplugins.com
 Contributors: Pippin Williamson, Dave Kiss
 */
 
+if ( version_compare( PHP_VERSION, '5.3.3', '<' ) ) {
+  add_action( 'admin_notices', 'eddmc_below_php_version_notice' );
+  function eddmc_below_php_version_notice() {
+    echo '<div class="error"><p>' . __( 'Your version of PHP is below the minimum version of PHP required by Easy Digital Downloads - MailChimp. Please contact your host and request that your version be upgraded to 5.3.3 or later.', 'eddmc' ) . '</p></div>';
+  }
+  return;
+}
+
 define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
 define( 'EDD_MAILCHIMP_PATH', dirname( __FILE__ ) );
 
