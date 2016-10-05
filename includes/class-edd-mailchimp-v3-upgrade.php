@@ -278,7 +278,7 @@ class EDD_MailChimp_V3_Upgrade {
    * @param  string $url redirect url location
    * @return void
    */
-  private function redirect( $url ) {
+  private static function redirect( $url ) {
     wp_redirect( $url ); exit;
   }
 }
