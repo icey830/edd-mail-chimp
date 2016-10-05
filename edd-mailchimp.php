@@ -92,7 +92,7 @@ class EDD_MailChimp_Extension {
         }
 
         if( ! class_exists( 'EDD_MailChimp' ) ) {
-          include( EDD_MAILCHIMP_PATH . '/includes/deprecated/class-edd-mailchimp.php' );
+          include( EDD_MAILCHIMP_PATH . '/includes/deprecated/class-edd-mailchimp-old.php' );
           $GLOBALS['eddmc'] = new EDD_MailChimp('mailchimp', 'MailChimp');
         }
       }
