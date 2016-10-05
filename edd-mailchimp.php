@@ -33,7 +33,7 @@ class EDD_MailChimp_Extension {
   public function instance() {
     if ( ! isset( self::$instance ) AND ! ( self::$instance instanceof EDD_MailChimp ) ) {
       self::$instance = new self;
-      self::$instance::_include_files();
+      self::$instance->_include_files();
 
       if ( class_exists( 'EDD_License' ) && is_admin() ) {
         $eddmc_license = new EDD_License( __FILE__, EDD_MAILCHIMP_PRODUCT_NAME, EDD_MAILCHIMP_VERSION, 'Pippin Williamson' );
@@ -105,7 +105,7 @@ class EDD_MailChimp_Extension {
    *
    * @return void
    */
-  private static function _include_files() {
+  private function _include_files() {
     // Require the drewm/mailchimp-api wrapper lib
     require('vendor/autoload.php');
 
