@@ -106,8 +106,9 @@ class EDD_MailChimp_Extension {
 	 * @return void
 	 */
 	private function _include_files() {
+
 		// Require the drewm/mailchimp-api wrapper lib
-		require('vendor/autoload.php');
+		require( EDD_MAILCHIMP_PATH . '/vendor/autoload.php' );
 
 		// Require deprecated API library while we transition
 		// everything over to API3
