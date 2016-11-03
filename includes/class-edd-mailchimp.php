@@ -254,7 +254,7 @@ class EDD_MailChimp {
 
 		foreach( $entries as $list ) {
 
-			if ( strpos( $list, '|' ) != FALSE ) {
+			if ( strpos( $list, '|' ) != false ) {
 				$parts          = explode( '|', $list );
 				$list_id        = $parts[0];
 				$interest_id    = $parts[1];
@@ -267,7 +267,7 @@ class EDD_MailChimp {
 			}
 
 			if ( isset( $interest_id ) ) {
-				$lists[$list_id][$interest_id] = TRUE;
+				$lists[$list_id][$interest_id] = true;
 			}
 		}
 
@@ -305,7 +305,7 @@ class EDD_MailChimp {
 		$opt_in = edd_get_option('eddmc_double_opt_in');
 
 		if ( $opt_in_override ) {
-			$opt_in = TRUE;
+			$opt_in = true;
 		}
 
 		$status = $opt_in ? 'pending' : 'subscribed';

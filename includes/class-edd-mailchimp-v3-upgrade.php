@@ -95,7 +95,7 @@ class EDD_MailChimp_V3_Upgrade {
 				$converted  = array();
 
 				foreach ( $settings as $index => $list ) {
-					if ( strpos( $list, '|' ) != FALSE ) {
+					if ( strpos( $list, '|' ) != false ) {
 
 						// This is an old style setting for MailChimp API v2,
 						// so we need to convert here. $list may look like any
