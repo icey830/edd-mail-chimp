@@ -2,11 +2,10 @@
 /*
 Plugin Name: Easy Digital Downloads - MailChimp
 Plugin URL: http://easydigitaldownloads.com/extension/mail-chimp
-Description: Include a MailChimp signup option with your Easy Digital Downloads checkout
+Description: Subscribe customers to MailChimp lists when purchasing products through Easy Digital Downloads
 Version: 2.5.6
-Author: Pippin Williamson
-Author URI: http://pippinsplugins.com
-Contributors: Pippin Williamson, Dave Kiss
+Author: Easy Digital Downloads
+Author URI: https://easydigitaldownloads.com
 */
 
 if ( version_compare( PHP_VERSION, '5.3.3', '<' ) ) {
