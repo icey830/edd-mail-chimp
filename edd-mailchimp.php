@@ -27,10 +27,10 @@ class EDD_MailChimp_Extension {
 	/**
 	 * Setup the instance using the correct class
 	 *
-	 * @return [type] [description]
+	 * @return instanceof EDD_MailChimp_Extension
 	 */
 	public static function instance() {
-		if ( ! isset( self::$instance ) AND ! ( self::$instance instanceof EDD_MailChimp ) ) {
+		if ( ! isset( self::$instance ) AND ! ( self::$instance instanceof EDD_MailChimp_Extension ) ) {
 			self::$instance = new self;
 			self::$instance->_include_files();
 
