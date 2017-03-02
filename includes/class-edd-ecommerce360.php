@@ -108,6 +108,8 @@ class EDD_MC_Ecommerce_360 {
 				return false;
 			}
 
+			$mailchimp = new MailChimp( $this->key );
+
 			// Increase purchase count and earnings
 			foreach ( $cart_details as $index => $download ) {
 				// Get the categories that this download belongs to, if any
@@ -137,11 +139,49 @@ class EDD_MC_Ecommerce_360 {
 
 				if ( edd_has_variable_prices( $download['id'] ) && isset( $download['item_number'], $download['item_number']['options'], $download['item_number']['options']['price_id'] ) ) {
 					$prices = get_post_meta( $download['id'], 'edd_variable_prices', true );
-					$item['product_variant_title'] = $prices[$download['item_number']['options']['price_id']]['name'];
-					$item['product_variant_id'] = (string) $download['item_number']['options']['price_id'];
+					if ( isset( $prices[$download['item_number']['options']['price_id']] ) ) {
+						$item['product_variant_title'] = $prices[$download['item_number']['options']['price_id']]['name'];
+						$item['product_variant_id'] = (string) $download['item_number']['options']['price_id'];
+					} else {
+						$item['product_variant_id'] = (string) $category_id;
+						$item['product_variant_title'] = $category_name;
+					}
 				} else {
 					$item['product_variant_id'] = (string) $category_id;
 					$item['product_variant_title'] = $category_name;
+				}
+
+				// Create/update the product in MailChimp
+				$variants = array();
+				if ( edd_has_variable_prices( $download['id'] ) ) {
+					foreach ( get_post_meta( $download['id'], 'edd_variable_prices', true ) as $price_id => $price_info ) {
+						$variants[] = array(
+							'id' => (string) $price_id,
+							'title' => $price_info['name'],
+						);
+					}
+				} else {
+					$variants = array(
+						array(
+							'id' => (string) $download['id'],
+							'title' => $download['name'],
+						)
+					);
+				}
+				$product_data = array(
+					'id' => $item['product_id'],
+					'title' => $download['name'],
+					'variants' => $variants,
+				);
+				$mailchimp->get( 'ecommerce/stores/' . $this->get_api_store_id() . '/products/' . $product_data['id'] );
+				if ( $mailchimp->success() ) {
+					$result = $mailchimp->patch( 'ecommerce/stores/' . $this->get_api_store_id() . '/products/' . $product_data['id'], $product_data );
+				} else {
+					$result = $mailchimp->post( 'ecommerce/stores/' . $this->get_api_store_id() . '/products', $product_data );
+				}
+				if ( ! $mailchimp->success() ) {
+					edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error (add/update product): ', 'eddmc' ) . $mailchimp->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
+					return false;
 				}
 
 				$items[] = apply_filters( 'edd_mc_item_vars', $item, $payment_id, $download );
@@ -174,19 +214,23 @@ class EDD_MC_Ecommerce_360 {
 				$order['tax_total'] = $tax; // double, optional
 			}
 
-			var_dump($order);
+			$order = apply_filters( 'edd_mc_order_vars', $order, $payment_id );
 
-			// Send to MailChimp
-			$mailchimp = new MailChimp( $this->key );
-
+			// Send/update order in MailChimp
 			try {
 				// TODO: Need to post if new, put if update?
-				$result = $mailchimp->post( 'ecommerce/stores/' . self::get_api_store_id() . '/orders', apply_filters( 'edd_mc_order_vars', $order, $payment_id ) );
+				$result = $mailchimp->post( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders', $order );
 				if ( $mailchimp->success() ) {
 					edd_insert_payment_note( $payment_id, __( 'Order details have been added to MailChimp successfully', 'eddmc' ) );
 				} else {
-					edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $mailchimp->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
-					return false;
+					// attempt to update if order ID already exists
+					$result = $mailchimp->patch( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders/' . $order['id'], $order );
+					if ( $mailchimp->success() ) {
+						edd_insert_payment_note( $payment_id, __( 'Order details have been updated in MailChimp successfully', 'eddmc' ) );
+					} else {
+						edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $mailchimp->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
+						return false;
+					}
 				}
 			} catch (Exception $e) {
 				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
