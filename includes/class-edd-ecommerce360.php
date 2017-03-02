@@ -1,5 +1,7 @@
 <?php
 
+use \DrewM\MailChimp\MailChimp;
+
 /**
  * EDD MailChimp Ecommerce360 class
  *
@@ -100,9 +102,14 @@ class EDD_MC_Ecommerce_360 {
 
 			$items = array();
 
+			// Ensure the store ID is set with MailChimp
+			if ( ! $this->update_api_store_id() ) {
+				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 error, store ID could not be updated', 'eddmc' ) );
+				return false;
+			}
+
 			// Increase purchase count and earnings
 			foreach ( $cart_details as $index => $download ) {
-
 				// Get the categories that this download belongs to, if any
 				$post = edd_get_download( $download['id'] );
 				$terms = get_the_terms( $download['id'], 'download_category' );
@@ -121,72 +128,66 @@ class EDD_MC_Ecommerce_360 {
 					$category_name = 'Download';
 				}
 
-				// "bundle" or "default"
-				$download_type    = edd_get_download_type( $download['id'] );
-				$download['sku']  = edd_get_download_sku( $download['id'] );
-
-				// if ( 'bundle' == $download_type ) {
-
-				//   $downloads = edd_get_bundled_products( $download_id );
-				//   if ( $downloads ) {
-				//     foreach ( $downloads as $d_id ) {
-				//       # Do something
-				//     }
-				//   }
-				// }
-
 				$item = array(
-					'line_num'      => $index + 1,
-					'product_id'    => (int) $download['id'], // int only and required, lame
-					'product_name'  => $download['name'],
-					'category_id'   => $category_id,          // int, required
-					'category_name' => $category_name,        // string, required
-					'qty'           => $download['quantity'], // double
-					'cost'          => $download['subtotal'], // double, cost of single line item
+					'id' => (string) ($index + 1),
+					'product_id' => (string) $download['id'],
+					'quantity' => intval( $download['quantity'] ),
+					'price' => $download['subtotal'], // double, cost of single line item
 				);
 
-				if ( $download['sku'] !== '-' ) {
-					$item['sku'] = $download['sku']; // optional, 30 char limit
+				if ( edd_has_variable_prices( $download['id'] ) && isset( $download['item_number'], $download['item_number']['options'], $download['item_number']['options']['price_id'] ) ) {
+					$prices = get_post_meta( $download['id'], 'edd_variable_prices', true );
+					$item['product_variant_title'] = $prices[$download['item_number']['options']['price_id']]['name'];
+					$item['product_variant_id'] = (string) $download['item_number']['options']['price_id'];
+				} else {
+					$item['product_variant_id'] = (string) $category_id;
+					$item['product_variant_title'] = $category_name;
 				}
 
-				$items[] = $item;
+				$items[] = apply_filters( 'edd_mc_item_vars', $item, $payment_id, $download );
 			}
 
 			$order = array(
-				'id'         => (string) $payment_id,// string
-				'email'      => $user_info['email'], // string
-				'total'      => $amount,             // double
-				'store_id'   => self::_edd_ec360_get_store_id(),   // string, 32 char limit
-				'store_name' => home_url(),          // string
-				'items'      => $items,
-				'order_date' => get_the_date( 'Y-n-j', $payment_id ),
+				'id' => (string) $payment_id,
+				'customer'   => array(
+					'id' => (string) $user_info['id'],
+					'email_address' => $user_info['email'],
+					'opt_in_status' => false,
+				),
+				'order_total' => $amount,
+				'lines' => $items,
+				'currency_code' => $download['currency'],
+				'processed_at_foreign' => get_the_date( 'c', $payment_id ),
 			);
 
 			// Set Ecommerce360 variables if they exist
 			$campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
 			$email_id    = get_post_meta( $payment_id, '_edd_mc_email_id', true );
 
+			// TODO: Fetch unique email address for customer using the ecommerce tracking email id?
+
 			if ( ! empty( $campaign_id ) ) {
 				$order['campaign_id'] = $campaign_id;
 			}
 
-			if ( ! empty( $email_id ) ) {
-				$order['email_id'] = $email_id;
+			if ( $tax != 0 ) {
+				$order['tax_total'] = $tax; // double, optional
 			}
 
-			if ( $tax != 0 ) {
-				$order['tax'] = $tax; // double, optional
-			}
+			var_dump($order);
 
 			// Send to MailChimp
-			$options = array(
-				'CURLOPT_FOLLOWLOCATION' => false
-			);
-			$mailchimp = new EDD_MailChimp_API( $this->key, $options );
+			$mailchimp = new MailChimp( $this->key );
 
 			try {
-				$result = $mailchimp->call( 'ecomm/order-add', array( 'order' => $order ) );
-				edd_insert_payment_note( $payment_id, __( 'Order details have been added to MailChimp successfully', 'eddmc' ) );
+				// TODO: Need to post if new, put if update?
+				$result = $mailchimp->post( 'ecommerce/stores/' . self::get_api_store_id() . '/orders', apply_filters( 'edd_mc_order_vars', $order, $payment_id ) );
+				if ( $mailchimp->success() ) {
+					edd_insert_payment_note( $payment_id, __( 'Order details have been added to MailChimp successfully', 'eddmc' ) );
+				} else {
+					edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $mailchimp->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
+					return false;
+				}
 			} catch (Exception $e) {
 				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
 				return false;
@@ -268,6 +269,46 @@ class EDD_MC_Ecommerce_360 {
 	 */
 	protected static function _edd_ec360_get_store_id() {
 		return md5( home_url() );
+	}
+
+	/**
+	 * Ensure the store ID has been created in MailChimp
+	 *
+	 * @return bool
+	 */
+	public function update_api_store_id() {
+		if ( ! $this->get_api_store_id() )
+			return false;
+
+		$mailchimp = new MailChimp( $this->key );
+
+		$store_data = array(
+			'id' => $this->get_api_store_id(),
+			'list_id' => edd_get_option( 'eddmc_list' ),
+			'name' => get_bloginfo( 'name' ),
+			'currency_code' => edd_get_currency(),
+		);
+		$mailchimp->get( 'ecommerce/stores/' . $this->get_api_store_id() );
+		if ( $mailchimp->success() ) {
+			$mailchimp->patch( 'ecommerce/stores/' . $this->get_api_store_id(), $store_data );
+		} else {
+			$mailchimp->post( 'ecommerce/stores', $store_data );
+		}
+
+		return $mailchimp->success();
+	}
+
+	/**
+	 * Make the store ID a combination of the home url hash and the list ID, as the list cannot be
+	 * changed for a store in the new api.
+	 *
+	 * @return string
+	 */
+	public function get_api_store_id() {
+		$list_id = edd_get_option( 'eddmc_list' );
+		if ( ! $list_id )
+			return false;
+		return self::_edd_ec360_get_store_id() . '-' . $list_id;
 	}
 
 }
