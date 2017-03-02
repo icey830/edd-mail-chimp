@@ -263,13 +263,14 @@ class EDD_MC_Ecommerce_360 {
 		}
 
 		// Send to MailChimp
-		$options = array(
-			'CURLOPT_FOLLOWLOCATION' => false
-		);
-		$mailchimp = new EDD_MailChimp_API( $this->key, $options );
+		$mailchimp = new MailChimp( $this->key );
 
 		try {
-			$result = $mailchimp->call( 'ecomm/order-del', array( 'store_id' => self::_edd_ec360_get_store_id(), 'order_id' => $payment_id ) );
+			$result = $mailchimp->delete( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders/' . $payment_id );
+			if ( ! $mailchimp->success() ) {
+				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error (delete purchase): ', 'eddmc' ) . $mailchimp->getLastError() );
+				return false;
+			}
 			edd_insert_payment_note( $payment_id, __( 'Order details have been removed from MailChimp successfully', 'eddmc' ) );
 			return true;
 		} catch (Exception $e) {
