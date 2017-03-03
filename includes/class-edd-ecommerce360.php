@@ -9,29 +9,10 @@ use \DrewM\MailChimp\MailChimp;
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       2.3
 */
-class EDD_MC_Ecommerce_360 {
-
-	/**
-	 * MailChimp API Key
-	 *
-	 * @var string | NULL
-	 */
-	public $key = NULL;
+class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 
 	public function __construct() {
-
-		if( ! function_exists( 'edd_get_option' ) ) {
-			return;
-		}
-
-		$api_key = edd_get_option( 'eddmc_api', '' );
-
-		if ( ! empty( $api_key ) ) {
-			$this->key = trim( $api_key );
-		}
-
 		add_action( 'init', array( $this, 'set_ecommerce360_session' ) );
-
 		add_action( 'edd_insert_payment', array( $this, 'set_ecommerce360_flags' ), 10, 2 );
 		add_action( 'edd_complete_purchase', array( $this, 'record_ecommerce360_purchase' ) );
 		add_action( 'edd_update_payment_status', array( $this, 'delete_ecommerce360_purchase' ), 10, 3 );
@@ -46,8 +27,8 @@ class EDD_MC_Ecommerce_360 {
 	 */
 	public function set_ecommerce360_flags( $payment_id = 0, $payment_data = array() ) {
 
-		// Make sure an API key has been entered
-		if ( empty( $this->key ) ) {
+		// Make sure API has been instantiated
+		if ( empty( $this->api ) ) {
 			return false;
 		}
 
@@ -71,7 +52,6 @@ class EDD_MC_Ecommerce_360 {
 			EDD()->session->set( $mc_eid_key, NULL );
 
 		}
-
 	}
 
 	/**
@@ -82,8 +62,8 @@ class EDD_MC_Ecommerce_360 {
 	 */
 	public function record_ecommerce360_purchase( $payment_id = 0 ) {
 
-		// Make sure an API key has been entered
-		if ( empty( $this->key ) ) {
+		// Make sure API has been instantiated
+		if ( empty( $this->api ) ) {
 			return false;
 		}
 
@@ -107,8 +87,6 @@ class EDD_MC_Ecommerce_360 {
 				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 error, store ID could not be updated', 'eddmc' ) );
 				return false;
 			}
-
-			$mailchimp = new MailChimp( $this->key );
 
 			// Increase purchase count and earnings
 			foreach ( $cart_details as $index => $download ) {
@@ -173,14 +151,14 @@ class EDD_MC_Ecommerce_360 {
 					'title' => $download['name'],
 					'variants' => $variants,
 				);
-				$mailchimp->get( 'ecommerce/stores/' . $this->get_api_store_id() . '/products/' . $product_data['id'] );
-				if ( $mailchimp->success() ) {
-					$result = $mailchimp->patch( 'ecommerce/stores/' . $this->get_api_store_id() . '/products/' . $product_data['id'], $product_data );
+				$this->api->get( 'ecommerce/stores/' . $this->get_api_store_id() . '/products/' . $product_data['id'] );
+				if ( $this->api->success() ) {
+					$result = $this->api->patch( 'ecommerce/stores/' . $this->get_api_store_id() . '/products/' . $product_data['id'], $product_data );
 				} else {
-					$result = $mailchimp->post( 'ecommerce/stores/' . $this->get_api_store_id() . '/products', $product_data );
+					$result = $this->api->post( 'ecommerce/stores/' . $this->get_api_store_id() . '/products', $product_data );
 				}
-				if ( ! $mailchimp->success() ) {
-					edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error (add/update product): ', 'eddmc' ) . $mailchimp->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
+				if ( ! $this->api->success() ) {
+					edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error (add/update product): ', 'eddmc' ) . $this->api->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
 					return false;
 				}
 
@@ -219,16 +197,16 @@ class EDD_MC_Ecommerce_360 {
 			// Send/update order in MailChimp
 			try {
 				// TODO: Need to post if new, put if update?
-				$result = $mailchimp->post( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders', $order );
-				if ( $mailchimp->success() ) {
+				$result = $this->api->post( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders', $order );
+				if ( $this->api->success() ) {
 					edd_insert_payment_note( $payment_id, __( 'Order details have been added to MailChimp successfully', 'eddmc' ) );
 				} else {
 					// attempt to update if order ID already exists
-					$result = $mailchimp->patch( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders/' . $order['id'], $order );
-					if ( $mailchimp->success() ) {
+					$result = $this->api->patch( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders/' . $order['id'], $order );
+					if ( $this->api->success() ) {
 						edd_insert_payment_note( $payment_id, __( 'Order details have been updated in MailChimp successfully', 'eddmc' ) );
 					} else {
-						edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $mailchimp->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
+						edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $this->api->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
 						return false;
 					}
 				}
@@ -258,17 +236,15 @@ class EDD_MC_Ecommerce_360 {
 		}
 
 		// Make sure an API key has been entered
-		if ( empty( $this->key ) ) {
+		if ( empty( $this->api ) ) {
 			return false;
 		}
 
 		// Send to MailChimp
-		$mailchimp = new MailChimp( $this->key );
-
 		try {
-			$result = $mailchimp->delete( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders/' . $payment_id );
-			if ( ! $mailchimp->success() ) {
-				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error (delete purchase): ', 'eddmc' ) . $mailchimp->getLastError() );
+			$result = $this->api->delete( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders/' . $payment_id );
+			if ( ! $this->api->success() ) {
+				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error (delete purchase): ', 'eddmc' ) . $this->api->getLastError() );
 				return false;
 			}
 			edd_insert_payment_note( $payment_id, __( 'Order details have been removed from MailChimp successfully', 'eddmc' ) );
@@ -325,22 +301,21 @@ class EDD_MC_Ecommerce_360 {
 		if ( ! $this->get_api_store_id() )
 			return false;
 
-		$mailchimp = new MailChimp( $this->key );
-
 		$store_data = array(
 			'id' => $this->get_api_store_id(),
 			'list_id' => edd_get_option( 'eddmc_list' ),
 			'name' => get_bloginfo( 'name' ),
 			'currency_code' => edd_get_currency(),
 		);
-		$mailchimp->get( 'ecommerce/stores/' . $this->get_api_store_id() );
-		if ( $mailchimp->success() ) {
-			$mailchimp->patch( 'ecommerce/stores/' . $this->get_api_store_id(), $store_data );
+
+		$this->api->get( 'ecommerce/stores/' . $this->get_api_store_id() );
+		if ( $this->api->success() ) {
+			$this->api->patch( 'ecommerce/stores/' . $this->get_api_store_id(), $store_data );
 		} else {
-			$mailchimp->post( 'ecommerce/stores', $store_data );
+			$this->api->post( 'ecommerce/stores', $store_data );
 		}
 
-		return $mailchimp->success();
+		return $this->api->success();
 	}
 
 	/**
@@ -351,8 +326,11 @@ class EDD_MC_Ecommerce_360 {
 	 */
 	public function get_api_store_id() {
 		$list_id = edd_get_option( 'eddmc_list' );
-		if ( ! $list_id )
+
+		if ( ! $list_id ) {
 			return false;
+		}
+
 		return self::_edd_ec360_get_store_id() . '-' . $list_id;
 	}
 
