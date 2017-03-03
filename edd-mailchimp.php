@@ -10,9 +10,11 @@ Author URI: https://easydigitaldownloads.com
 
 if ( version_compare( PHP_VERSION, '5.3.3', '<' ) ) {
 	add_action( 'admin_notices', 'eddmc_below_php_version_notice' );
+
 	function eddmc_below_php_version_notice() {
 		echo '<div class="error"><p>' . __( 'Your version of PHP is below the minimum version of PHP required by Easy Digital Downloads - MailChimp. Please contact your host and request that your version be upgraded to 5.3.3 or later.', 'eddmc' ) . '</p></div>';
 	}
+
 	return;
 }
 
@@ -44,17 +46,16 @@ class EDD_MailChimp_Extension {
 
 
 	public function __construct() {
-		add_action('plugins_loaded', array( $this, 'init') );
+		add_action('plugins_loaded', array( $this, 'load_upgrade_routine') );
 	}
 
 
 	/**
-	 * Load either the API2 or API3 classes, depending on if
-	 * the user has run the upgrade routine.
+	 * Load upgrade routine if required
 	 *
 	 * @return void
 	 */
-	public function init() {
+	public function load_upgrade_routine() {
 
 		if ( class_exists('Easy_Digital_Downloads') && function_exists('edd_has_upgrade_completed') ) {
 
@@ -70,29 +71,12 @@ class EDD_MailChimp_Extension {
 			// update_option( 'edd_completed_upgrades', $completed_upgrades );
 			// DEV ONLY
 
-			if ( edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
-				// Use the new MailChimp class
-				if( ! class_exists( 'EDD_MailChimp' ) ) {
-					include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp.php' );
-					$GLOBALS['eddmc'] = new EDD_MailChimp;
-				}
+			if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
 
-			} else {
-				// Load API2
 				// Require upgrade routine
-				if( ! class_exists( 'EDD_MailChimp_V3_Upgrade' ) ) {
+				if ( ! class_exists( 'EDD_MailChimp_V3_Upgrade' ) ) {
 					include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-v3-upgrade.php' );
 					new EDD_MailChimp_V3_Upgrade;
-				}
-
-				// Require deprecated classes
-				if( ! class_exists( 'EDD_Newsletter' ) ) {
-					include( EDD_MAILCHIMP_PATH . '/includes/deprecated/class-edd-newsletter.php' );
-				}
-
-				if( ! class_exists( 'EDD_MailChimp' ) ) {
-					include( EDD_MAILCHIMP_PATH . '/includes/deprecated/class-edd-mailchimp-old.php' );
-					$GLOBALS['eddmc'] = new EDD_MailChimp('mailchimp', 'MailChimp');
 				}
 			}
 		}
@@ -106,16 +90,14 @@ class EDD_MailChimp_Extension {
 	 */
 	private function _include_files() {
 
-		// Require the drewm/mailchimp-api wrapper lib
 		require( EDD_MAILCHIMP_PATH . '/vendor/autoload.php' );
 
-		// Require deprecated API library while we transition
-		// everything over to API3
-		if( ! class_exists( 'EDD_MailChimp_API' ) ) {
-			include( EDD_MAILCHIMP_PATH . '/includes/deprecated/class-edd-mailchimp-api.php' );
+		if ( ! class_exists( 'EDD_MailChimp' ) ) {
+			include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp.php' );
+			$GLOBALS['eddmc'] = new EDD_MailChimp;
 		}
 
-		if( ! class_exists( 'EDD_MC_Ecommerce_360' ) ) {
+		if ( ! class_exists( 'EDD_MC_Ecommerce_360' ) ) {
 			include( EDD_MAILCHIMP_PATH . '/includes/class-edd-ecommerce360.php' );
 		}
 
