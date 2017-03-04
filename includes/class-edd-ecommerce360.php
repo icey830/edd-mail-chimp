@@ -29,21 +29,21 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 
 		// Make sure API has been instantiated
 		if ( empty( $this->api ) ) {
-			return false;
+			return;
 		}
 
 		// Don't record details if we're in test mode
 		if ( edd_is_test_mode() ) {
-			return false;
+			return;
 		}
 
-		$mc_cid_key  = self::_edd_ec360_get_session_id( 'campaign' );
-		$mc_eid_key  = self::_edd_ec360_get_session_id( 'email' );
+		$mc_cid_key  = self::_get_session_id( 'campaign' );
+		$mc_eid_key  = self::_get_session_id( 'email' );
 
 		$campaign_id = EDD()->session->get( $mc_cid_key );
 		$email_id    = EDD()->session->get( $mc_eid_key );
 
-		if ( isset( $campaign_id ) && isset( $email_id ) ) {
+		if ( ! empty( $campaign_id ) && ! empty( $email_id ) ) {
 
 			add_post_meta( $payment_id, '_edd_mc_campaign_id', $campaign_id, true );
 			add_post_meta( $payment_id, '_edd_mc_email_id', $email_id, true );
@@ -267,8 +267,8 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 		$mc_eid = isset( $_GET['mc_eid'] ) ? $_GET['mc_eid'] : '';
 
 		if ( ! empty( $mc_cid ) && ! empty( $mc_eid ) ) {
-			EDD()->session->set( self::_edd_ec360_get_session_id( 'campaign' ), filter_var( $mc_cid , FILTER_SANITIZE_STRING ) );
-			EDD()->session->set( self::_edd_ec360_get_session_id( 'email' ),    filter_var( $mc_eid , FILTER_SANITIZE_STRING ) );
+			EDD()->session->set( self::_get_session_id( 'campaign' ), filter_var( $mc_cid , FILTER_SANITIZE_STRING ) );
+			EDD()->session->set( self::_get_session_id( 'email' ),    filter_var( $mc_eid , FILTER_SANITIZE_STRING ) );
 		}
 	}
 
@@ -278,9 +278,9 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 	 * @param  string $type campaign | email
 	 * @return string Key identifier for stored sessions
 	 */
-	protected static function _edd_ec360_get_session_id( $type = 'campaign' ) {
+	protected static function _get_session_id( $type = 'campaign' ) {
 		$prefix = substr( $type, 0, 1);
-		return sprintf( 'edd_mc360_%1$s_%2$sid', substr( self::_edd_ec360_get_store_id(), 0, 10 ), $prefix );
+		return sprintf( 'edd_mc360_%1$s_%2$sid', substr( self::_get_store_id(), 0, 10 ), $prefix );
 	}
 
 	/**
@@ -288,7 +288,7 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 	 *
 	 * @return string
 	 */
-	protected static function _edd_ec360_get_store_id() {
+	protected static function _get_store_id() {
 		return md5( home_url() );
 	}
 
@@ -331,7 +331,7 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 			return false;
 		}
 
-		return self::_edd_ec360_get_store_id() . '-' . $list_id;
+		return self::_get_store_id() . '-' . $list_id;
 	}
 
 }
