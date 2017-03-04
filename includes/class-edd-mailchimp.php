@@ -129,7 +129,7 @@ class EDD_MailChimp {
 	 * Flush the list transient on save
 	 */
 	public function save_settings( $input ) {
-		if( isset( $input['eddmc_api'] ) ) {
+		if ( isset( $input['eddmc_api'] ) ) {
 			delete_transient( 'edd_mailchimp_list_data' );
 		}
 		return $input;
