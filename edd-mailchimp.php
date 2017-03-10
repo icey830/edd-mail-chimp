@@ -113,12 +113,14 @@ class EDD_MailChimp {
 		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-store.php' );
 
 		// Includes
+		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-database.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-actions.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-checkout.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-ecommerce.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-metabox.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-settings.php' );
 
+		new EDD_MailChimp_Database;
 		new EDD_MailChimp_Actions;
 		new EDD_MailChimp_Checkout;
 		new EDD_MailChimp_Ecommerce;
