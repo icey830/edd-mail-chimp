@@ -42,5 +42,8 @@ class EDD_MailChimp_Customer extends EDD_MailChimp_Model {
       'first_name'    => $first_name,
       'last_name'     => $last_name,
     );
+
+    $this->_record = apply_filters('edd.mailchimp.customer', $customer);
   }
+
 }
