@@ -3,13 +3,15 @@
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-class EDD_Mailchimp_Customer extends EDD_Mailchimp_Model {
+class EDD_MailChimp_Customer extends EDD_MailChimp_Model {
 
   public $customer;
 
   public function __construct( $customer ) {
+    parent::__construct();
+
     if ( is_integer($customer) ) {
-      $this->customer = new EDD_Customer($customer)
+      $this->customer = new EDD_Customer($customer);
     } elseif ( is_object( $customer ) && get_class($customer) === 'EDD_Customer' ) {
       $this->customer = $customer;
     } else {
@@ -18,12 +20,11 @@ class EDD_Mailchimp_Customer extends EDD_Mailchimp_Model {
   }
 
   /**
-   * [create description]
-   * @see  http://docs.easydigitaldownloads.com/article/1004-eddcustomer
+   * Build a customer record from defaults
+   *
    * @return [type] [description]
    */
-  public function create() {
-
+  protected function _build() {
     $names      = explode( ' ', $this->customer->name );
     $first_name = ! empty( $names[0] ) ? $names[0] : '';
     $last_name  = '';
