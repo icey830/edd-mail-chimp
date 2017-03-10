@@ -9,7 +9,7 @@ use \DrewM\MailChimp\MailChimp;
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       2.3
 */
-class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
+class EDD_MailChimp_Ecommerce extends EDD_MailChimp {
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'set_ecommerce360_session' ) );
@@ -64,21 +64,17 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 
 		// Make sure API has been instantiated
 		if ( empty( $this->api ) ) {
-			return false;
+			return;
 		}
 
 		// Don't record details if we're in test mode
 		if ( edd_is_test_mode() ) {
-			return false;
+			return;
 		}
 
-		$payment      = edd_get_payment_meta( $payment_id );
-		$user_info    = edd_get_payment_meta_user_info( $payment_id );
-		$amount       = edd_get_payment_amount( $payment_id );
-		$cart_details = edd_get_payment_meta_cart_details( $payment_id );
-		$tax          = edd_get_payment_tax( $payment_id );
+		$payment = new EDD_Payment( $payment_id  );
 
-		if ( is_array( $cart_details ) ) {
+		if ( is_array( $payment->cart_details ) ) {
 
 			$items = array();
 
@@ -89,9 +85,9 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 			}
 
 			// Increase purchase count and earnings
-			foreach ( $cart_details as $index => $download ) {
+			foreach ( $payment->cart_details as $index => $download ) {
+
 				// Get the categories that this download belongs to, if any
-				$post = edd_get_download( $download['id'] );
 				$terms = get_the_terms( $download['id'], 'download_category' );
 
 				if ( $terms && ! is_wp_error( $terms ) ) {
@@ -129,39 +125,6 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 					$item['product_variant_title'] = $category_name;
 				}
 
-				// Create/update the product in MailChimp
-				$variants = array();
-				if ( edd_has_variable_prices( $download['id'] ) ) {
-					foreach ( get_post_meta( $download['id'], 'edd_variable_prices', true ) as $price_id => $price_info ) {
-						$variants[] = array(
-							'id' => (string) $price_id,
-							'title' => $price_info['name'],
-						);
-					}
-				} else {
-					$variants = array(
-						array(
-							'id' => (string) $download['id'],
-							'title' => $download['name'],
-						)
-					);
-				}
-				$product_data = array(
-					'id' => $item['product_id'],
-					'title' => $download['name'],
-					'variants' => $variants,
-				);
-				$this->api->get( 'ecommerce/stores/' . $this->get_api_store_id() . '/products/' . $product_data['id'] );
-				if ( $this->api->success() ) {
-					$result = $this->api->patch( 'ecommerce/stores/' . $this->get_api_store_id() . '/products/' . $product_data['id'], $product_data );
-				} else {
-					$result = $this->api->post( 'ecommerce/stores/' . $this->get_api_store_id() . '/products', $product_data );
-				}
-				if ( ! $this->api->success() ) {
-					edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error (add/update product): ', 'eddmc' ) . $this->api->getLastError() . ( WP_DEBUG ? print_r( $result, true ) : '' ) );
-					return false;
-				}
-
 				$items[] = apply_filters( 'edd_mc_item_vars', $item, $payment_id, $download );
 			}
 
@@ -197,12 +160,12 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 			// Send/update order in MailChimp
 			try {
 				// TODO: Need to post if new, put if update?
-				$result = $this->api->post( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders', $order );
+				$result = $this->api->post( 'ecommerce/stores/' . self::_get_store_id() . '/orders', $order );
 				if ( $this->api->success() ) {
 					edd_insert_payment_note( $payment_id, __( 'Order details have been added to MailChimp successfully', 'eddmc' ) );
 				} else {
 					// attempt to update if order ID already exists
-					$result = $this->api->patch( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders/' . $order['id'], $order );
+					$result = $this->api->patch( 'ecommerce/stores/' . self::_get_store_id() . '/orders/' . $order['id'], $order );
 					if ( $this->api->success() ) {
 						edd_insert_payment_note( $payment_id, __( 'Order details have been updated in MailChimp successfully', 'eddmc' ) );
 					} else {
@@ -216,8 +179,6 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 			}
 
 			return true;
-		} else {
-			return false;
 		}
 	}
 
@@ -242,7 +203,7 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 
 		// Send to MailChimp
 		try {
-			$result = $this->api->delete( 'ecommerce/stores/' . $this->get_api_store_id() . '/orders/' . $payment_id );
+			$result = $this->api->delete( 'ecommerce/stores/' . self::_get_store_id() . '/orders/' . $payment_id );
 			if ( ! $this->api->success() ) {
 				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error (delete purchase): ', 'eddmc' ) . $this->api->getLastError() );
 				return false;
@@ -281,57 +242,6 @@ class EDD_MC_Ecommerce_360 extends EDD_MailChimp {
 	protected static function _get_session_id( $type = 'campaign' ) {
 		$prefix = substr( $type, 0, 1);
 		return sprintf( 'edd_mc360_%1$s_%2$sid', substr( self::_get_store_id(), 0, 10 ), $prefix );
-	}
-
-	/**
-	 * Returns the store ID variable for use in the MailChimp API
-	 *
-	 * @return string
-	 */
-	protected static function _get_store_id() {
-		return md5( home_url() );
-	}
-
-	/**
-	 * Ensure the store ID has been created in MailChimp
-	 *
-	 * @return bool
-	 */
-	public function update_api_store_id() {
-		if ( ! $this->get_api_store_id() )
-			return false;
-
-		$store_data = array(
-			'id' => $this->get_api_store_id(),
-			'list_id' => edd_get_option( 'eddmc_list' ),
-			'name' => get_bloginfo( 'name' ),
-			'currency_code' => edd_get_currency(),
-		);
-
-		$this->api->get( 'ecommerce/stores/' . $this->get_api_store_id() );
-		if ( $this->api->success() ) {
-			$this->api->patch( 'ecommerce/stores/' . $this->get_api_store_id(), $store_data );
-		} else {
-			$this->api->post( 'ecommerce/stores', $store_data );
-		}
-
-		return $this->api->success();
-	}
-
-	/**
-	 * Make the store ID a combination of the home url hash and the list ID, as the list cannot be
-	 * changed for a store in the new api.
-	 *
-	 * @return string
-	 */
-	public function get_api_store_id() {
-		$list_id = edd_get_option( 'eddmc_list' );
-
-		if ( ! $list_id ) {
-			return false;
-		}
-
-		return self::_get_store_id() . '-' . $list_id;
 	}
 
 }

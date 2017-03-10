@@ -22,7 +22,7 @@ define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
 define( 'EDD_MAILCHIMP_PATH', dirname( __FILE__ ) );
 define( 'EDD_MAILCHIMP_VERSION', '2.5.6' );
 
-class EDD_MailChimp_Extension {
+class EDD_MailChimp {
 
 	private static $instance;
 
@@ -44,11 +44,17 @@ class EDD_MailChimp_Extension {
 		return self::$instance;
 	}
 
-
 	public function __construct() {
 		add_action('plugins_loaded', array( $this, 'load_upgrade_routine') );
+		add_action( 'init', array( $this, 'textdomain' ) );
 	}
 
+	/**
+	 * Load the plugin's textdomain
+	 */
+	public function textdomain() {
+		load_plugin_textdomain( 'eddmc', false, EDD_MAILCHIMP_PATH . '/languages/' );
+	}
 
 	/**
 	 * Load upgrade routine if required
@@ -92,17 +98,32 @@ class EDD_MailChimp_Extension {
 
 		require( EDD_MAILCHIMP_PATH . '/vendor/autoload.php' );
 
-		if ( ! class_exists( 'EDD_MailChimp' ) ) {
-			include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp.php' );
-			$GLOBALS['eddmc'] = new EDD_MailChimp;
-		}
+		// Models
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-api.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-collection.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-model.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-cart.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-customer.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-interest.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-interest-category.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-list.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-order.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-product.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-store.php' );
 
-		if ( ! class_exists( 'EDD_MC_Ecommerce_360' ) ) {
-			include( EDD_MAILCHIMP_PATH . '/includes/class-edd-ecommerce360.php' );
-		}
+		// Includes
+		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-actions.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-checkout.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-ecommerce.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-metabox.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-settings.php' );
 
-		$edd_mc360 = new EDD_MC_Ecommerce_360;
+		new EDD_MailChimp_Actions;
+		new EDD_MailChimp_Checkout;
+		new EDD_MailChimp_Ecommerce;
+		new EDD_MailChimp_Metabox;
+		new EDD_MailChimp_Settings;
 	}
 }
 
-EDD_MailChimp_Extension::instance();
+$GLOBALS['eddmc'] = EDD_MailChimp::instance();
