@@ -5,31 +5,37 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 
 class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 
-  protected $_payment;
   public $_endpoint = 'orders';
+  protected $_payment;
 
   public function __construct( $payment = false ) {
     parent::__construct();
 
+    $this->_set_payment( $payment );
+    $this->_build();
+  }
+
+  /**
+   * [_set_payment description]
+   * @param [type] $payment [description]
+   */
+  protected function _set_payment($payment) {
     if ( is_integer($payment) ) {
       $this->_payment = new EDD_Payment($payment);
     } elseif ( is_object( $payment ) && get_class($payment) === 'EDD_Payment' ) {
       $this->_payment = $payment;
-    } else {
-      $this->_payment = false;
     }
 
-    if ( $this->_payment ) {
-      $this->_resource = $this->_endpoint . '/' . $this->_payment->number;
-    }
+    $this->id = apply_filters('edd.mailchimp.order.id', $this->_payment->number, $this->_payment);
   }
+
 
   /**
    * [build description]
    * @return [type] [description]
    */
   protected function _build() {
-    $this->_record = array(
+    $order = array(
       'id'       => (string) $this->_payment->number,
       'customer' => array(
         'id'            => $this->_payment->customer_id,
@@ -81,7 +87,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
     );
 
     foreach ( $this->_payment->cart_details as $line ) {
-      $this->_record['lines'][] = array(
+      $order['lines'][] = array(
         'id'         => $line['id'],
         'product_id' => $line['id'],
         'product_variant_id' => $line['item_number']['options']['price_id'],
@@ -90,5 +96,8 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
         'discount'   => $line['discount']
       );
     }
+
+    $this->_record = apply_filters('edd.mailchimp.order', $order, $this->_payment);
+    return $this;
   }
 }
