@@ -27,11 +27,6 @@ class EDD_MailChimp_Ecommerce extends EDD_MailChimp {
 	 */
 	public function set_ecommerce360_flags( $payment_id = 0, $payment_data = array() ) {
 
-		// Make sure API has been instantiated
-		if ( empty( $this->api ) ) {
-			return;
-		}
-
 		// Don't record details if we're in test mode
 		if ( edd_is_test_mode() ) {
 			return;
@@ -61,11 +56,6 @@ class EDD_MailChimp_Ecommerce extends EDD_MailChimp {
 	 * @return bool
 	 */
 	public function record_ecommerce360_purchase( $payment_id = 0 ) {
-
-		// Make sure API has been instantiated
-		if ( empty( $this->api ) ) {
-			return;
-		}
 
 		// Don't record details if we're in test mode
 		if ( edd_is_test_mode() ) {
