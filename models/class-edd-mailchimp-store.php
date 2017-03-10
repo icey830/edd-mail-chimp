@@ -103,4 +103,17 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
     $this->_record = apply_filters('edd.mailchimp.store', $record);
     return $this;
   }
+
+
+  /**
+   * Set the store's remote sync status
+   *
+   * @param  boolean $status [description]
+   * @return boolean         [description]
+   */
+  public function is_syncing( $status = true ) {
+    $this->_record['is_syncing'] = $status;
+    $this->save();
+  }
+
 }
