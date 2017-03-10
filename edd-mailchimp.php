@@ -21,6 +21,7 @@ if ( version_compare( PHP_VERSION, '5.3.3', '<' ) ) {
 define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
 define( 'EDD_MAILCHIMP_PATH', dirname( __FILE__ ) );
 define( 'EDD_MAILCHIMP_VERSION', '2.5.6' );
+define( 'EDD_MAILCHIMP_BASENAME', plugin_basename( __FILE__ ) );
 
 class EDD_MailChimp {
 
