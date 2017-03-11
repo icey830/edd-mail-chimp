@@ -18,11 +18,6 @@ if ( version_compare( PHP_VERSION, '5.3.3', '<' ) ) {
 	return;
 }
 
-define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
-define( 'EDD_MAILCHIMP_PATH', dirname( __FILE__ ) );
-define( 'EDD_MAILCHIMP_VERSION', '2.5.6' );
-define( 'EDD_MAILCHIMP_BASENAME', plugin_basename( __FILE__ ) );
-
 class EDD_MailChimp {
 
 	private static $instance;
@@ -35,6 +30,7 @@ class EDD_MailChimp {
 	public static function instance() {
 		if ( ! isset( self::$instance ) AND ! ( self::$instance instanceof EDD_MailChimp_Extension ) ) {
 			self::$instance = new self;
+			self::$instance->_define_constants();
 			self::$instance->_include_files();
 
 			if ( class_exists( 'EDD_License' ) && is_admin() ) {
@@ -87,6 +83,28 @@ class EDD_MailChimp {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Define any constants used throughout the plugin
+	 *
+	 * @return [type] [description]
+	 */
+	private function _define_constants() {
+    global $wpdb;
+
+    if ( ! isset( $wpdb->edd_mailchimp_lists ) ) {
+      $wpdb->edd_mailchimp_lists = $wpdb->prefix . 'edd_mailchimp_lists';
+    }
+
+    if ( ! isset( $wpdb->edd_mailchimp_downloads_lists ) ) {
+      $wpdb->edd_mailchimp_downloads_lists = $wpdb->prefix . 'edd_mailchimp_downloads_lists';
+    }
+
+		define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
+		define( 'EDD_MAILCHIMP_PATH', dirname( __FILE__ ) );
+		define( 'EDD_MAILCHIMP_VERSION', '2.5.6' );
+		define( 'EDD_MAILCHIMP_BASENAME', plugin_basename( __FILE__ ) );
 	}
 
 
