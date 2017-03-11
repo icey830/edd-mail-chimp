@@ -111,7 +111,7 @@ class EDD_MailChimp_Database {
     id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
     remote_id varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT "",
     name varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT "",
-    is_default tinyint(2) NOT NULL default '0',
+    is_default tinyint(2) NOT NULL default "0",
     PRIMARY KEY  (id)
     ) CHARACTER SET utf8 COLLATE utf8_general_ci;
     CREATE TABLE '.$wpdb->prefix.'edd_mailchimp_downloads_lists (
