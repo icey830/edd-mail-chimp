@@ -48,7 +48,7 @@ const config = {
       verbose: false,
     }),
     new ExtractTextPlugin({
-      filename: './assets/dist/css/[name].css',
+      filename: './css/[name].css',
       allChunks: true,
       disable: !isProduction,
     })
