@@ -9,6 +9,7 @@ class EDD_MailChimp_Actions {
     // add_action( 'edd_download_post_create', array( $this, 'create_download' ) );
     // add_action( 'edd_customer_post_create', array( $this, 'create_customer' ) );
     // add_action( 'edd_cart_contents_loaded_from_session', array( $this, 'set_cart' ) );
+    add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_scripts') );
     add_action( 'edd_complete_download_purchase', array( $this, 'hook_signup' ), 10, 3 );
   }
 
@@ -18,6 +19,21 @@ class EDD_MailChimp_Actions {
    */
   public function hook_signup() {
     add_action( 'edd_complete_purchase', array( $this, 'completed_purchase_signup' ) );
+  }
+
+  /**
+   * Load required admin scripts and styles here.
+   * @param  string $hook Current admin page
+   * @return void
+   */
+  public function load_admin_scripts( $hook ) {
+
+    if ( $hook !== 'download_page_edd-settings' ) {
+      return;
+    }
+
+    wp_register_style('edd-mailchimp', EDD_MAILCHIMP_URL . 'assets/dist/css/main.css');
+    wp_enqueue_style('edd-mailchimp');
   }
 
   /**
