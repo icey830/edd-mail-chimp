@@ -20,11 +20,17 @@ class ComposerStaticInitcfd3f6cd2535204908d2c095c61df323
         ),
     );
 
+    public static $classMap = array (
+        'WP_Async_Request' => __DIR__ . '/..' . '/a5hleyrich/wp-background-processing/classes/wp-async-request.php',
+        'WP_Background_Process' => __DIR__ . '/..' . '/a5hleyrich/wp-background-processing/classes/wp-background-process.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitcfd3f6cd2535204908d2c095c61df323::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitcfd3f6cd2535204908d2c095c61df323::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitcfd3f6cd2535204908d2c095c61df323::$classMap;
 
         }, null, ClassLoader::class);
     }

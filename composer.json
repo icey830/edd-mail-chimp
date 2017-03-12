@@ -1,5 +1,6 @@
 {
     "require": {
-        "drewm/mailchimp-api": "^2.4"
+        "drewm/mailchimp-api": "^2.4",
+        "a5hleyrich/wp-background-processing": "^1.0"
     }
 }

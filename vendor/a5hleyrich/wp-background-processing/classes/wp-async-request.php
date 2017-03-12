@@ -141,9 +141,6 @@ if ( ! class_exists( 'WP_Async_Request' ) ) {
 		 * Check for correct nonce and pass to handler.
 		 */
 		public function maybe_handle() {
-			// Don't lock up other requests while processing
-			session_write_close();
-
 			check_ajax_referer( $this->identifier, 'nonce' );
 
 			$this->handle();
@@ -161,4 +158,3 @@ if ( ! class_exists( 'WP_Async_Request' ) ) {
 
 	}
 }
-0
