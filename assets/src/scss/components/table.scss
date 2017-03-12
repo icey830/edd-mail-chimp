@@ -1,0 +1,73 @@
+.is-edd-mailchimp-table {
+  margin-bottom: 2em;
+
+  th, td {
+    padding: 1em;
+  }
+
+  tr:nth-child(even) {
+    background-color: #fcfcfc;
+  }
+}
+
+.is-edd-mailchimp-lists-table {
+  th:first-child {
+    width: 8px;
+    padding: 1em 0;
+  }
+}
+
+.is-mailchimp-list-name {
+  font-weight: bold;
+  font-size: 1.2em;
+  line-height: 1.6em;
+  display: block;
+}
+
+.is-mailchimp-list-id {
+  color: #ccc;
+}
+
+.is-default-mailchimp-list {
+  background: #0085ba;
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.is-last-sync-date {
+  display: block;
+}
+
+
+.is-edd-mailchimp-table-container {
+  max-height: 20em;
+
+  table {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+    width: 100%;
+
+    thead {
+      flex: 0 0 auto;
+      width: calc(100% - 0.9em);
+    }
+
+    tbody {
+      flex: 1 1 auto;
+      display: block;
+      overflow-y: scroll;
+
+      tr {
+        width: 100%;
+      }
+    }
+
+    thead, table tbody tr {
+      display: table;
+      table-layout: fixed;
+    }
+  }
+}
