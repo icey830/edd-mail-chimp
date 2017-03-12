@@ -102,8 +102,9 @@ class EDD_MailChimp {
     }
 
 		define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
-		define( 'EDD_MAILCHIMP_PATH', dirname( __FILE__ ) );
 		define( 'EDD_MAILCHIMP_VERSION', '2.5.6' );
+    define( 'EDD_MAILCHIMP_URL',  plugin_dir_url(__FILE__) );
+    define( 'EDD_MAILCHIMP_PATH', plugin_dir_path(__FILE__) );
 		define( 'EDD_MAILCHIMP_BASENAME', plugin_basename( __FILE__ ) );
 	}
 
