@@ -122,7 +122,7 @@ class EDD_MailChimp_Database {
     download_id bigint(20) unsigned NOT NULL,
     list_id bigint(20) unsigned NOT NULL,
     PRIMARY KEY  (id),
-    KEY `download_id` (`download_id`)
+    KEY `download_id` (`download_id`),
     KEY `list_id` (`list_id`)
     ) CHARACTER SET utf8 COLLATE utf8_general_ci;
     ';
