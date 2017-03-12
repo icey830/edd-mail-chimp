@@ -171,6 +171,7 @@ class EDD_MailChimp_Database {
    */
   public function migrate() {
     self::$_version = self::get_db_version();
+    self::update_tables();
     self::update_db_version();
   }
 }
