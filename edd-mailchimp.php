@@ -139,12 +139,16 @@ class EDD_MailChimp {
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-metabox.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-settings.php' );
 
+		// Jobs
+		require_once( EDD_MAILCHIMP_PATH . '/jobs/class-edd-mailchimp-sync.php' );
+
 		new EDD_MailChimp_Database;
 		new EDD_MailChimp_Actions;
 		new EDD_MailChimp_Checkout;
 		new EDD_MailChimp_Ecommerce;
 		new EDD_MailChimp_Metabox;
 		new EDD_MailChimp_Settings;
+		new EDD_MailChimp_Sync;
 	}
 }
 

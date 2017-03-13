@@ -143,7 +143,9 @@ class EDD_MailChimp_Settings {
             '%s', '%s', '%d', '%s', '%s'
           ) );
 
-          // Todo: Fire up a sync job
+          // Find or Create a MailChimp Store for this list and fire up a full sync job
+          $store = EDD_MailChimp_Store::find_or_create( $list->id );
+          $store->sync();
         }
       }
     }

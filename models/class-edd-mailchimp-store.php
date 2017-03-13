@@ -113,6 +113,67 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
     return $this;
   }
 
+  /**
+   * Sync the EDD store with MailChimp
+   *
+   * @return void
+   */
+  public function sync( $model = '' ) {
+    global $wpdb;
+    $batch_size   = 25;
+    $is_full_sync = $model === '' ? true : false;
+
+   // Figure out how many records of a certain type we have to deal with
+   // in our job and chunks up the workload for use in multiple tasks.
+    switch ( $model ) {
+      case '':
+      case 'products':
+        $sync_type = 'products';
+        $total_sql = "SELECT COUNT(ID) as total FROM $wpdb->posts WHERE post_type = 'download'";
+        $edd_wrapper_class_name = 'EDD_Download';
+        $edd_mailchimp_model_name = 'EDD_MailChimp_Product';
+        break;
+      case 'orders':
+        $sync_type = 'orders';
+        $total_sql = "SELECT COUNT(ID) as total FROM $wpdb->posts WHERE post_type = 'edd_payment'";
+        $edd_wrapper_class_name = 'EDD_Payment';
+        $edd_mailchimp_model_name = 'EDD_MailChimp_Order';
+      default:
+        return false;
+    }
+
+    $results = $wpdb->get_row( $total_sql, 0 );
+    $pages   = ceil( $results->total / $batch_size );
+
+    // Init the job class
+    $job = new EDD_MailChimp_Sync;
+
+    // Push items to the queue
+    for( $page = 1; $page <= $pages; $page++ ) {
+
+      $offset = ( $page - 1 ) * $batch_size;
+
+      $data = array(
+        'status' => 'queued',
+        'payload' => array(
+          'is_full_sync' => $is_full_sync,
+          'sync_type'    => $sync_type,
+          'total_records'=> $results->total,
+          'batch_size'   => $batch_size,
+          'offset'       => $offset,
+          'list_id'      => $this->list_id,
+          'edd_wrapper_class_name'   => $edd_wrapper_class_name,
+          'edd_mailchimp_model_name' => $edd_mailchimp_model_name,
+        )
+      );
+
+      $job->push_to_queue( $data );
+    }
+
+    // Save and dispatch the queue
+    $job->save()->dispatch();
+  }
+
 
   /**
    * Set the store's remote sync status
