@@ -76,6 +76,15 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
     $this->_resource = $this->_endpoint . '/' . $this->id;
   }
 
+  /**
+   * Resource getter
+   *
+   * @return [type] [description]
+   */
+  public function get_resource() {
+    return $this->_resource;
+  }
+
 
   /**
    * Build the store record based on sensible defaults.
