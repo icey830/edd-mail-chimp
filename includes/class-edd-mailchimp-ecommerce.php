@@ -68,12 +68,6 @@ class EDD_MailChimp_Ecommerce {
 
 			$items = array();
 
-			// Ensure the store ID is set with MailChimp
-			if ( ! $this->update_api_store_id() ) {
-				edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 error, store ID could not be updated', 'eddmc' ) );
-				return false;
-			}
-
 			// Increase purchase count and earnings
 			foreach ( $payment->cart_details as $index => $download ) {
 
