@@ -127,11 +127,16 @@ class EDD_MailChimp_Settings {
             continue;
           }
 
+          // Determine if list should be set as default
+          // based on if another default list already exists.
+          $check = $wpdb->get_row("SELECT * FROM $wpdb->edd_mailchimp_lists WHERE is_default = 1");
+          $is_default = $check !== null ? 0 : 1;
+
           // Insert as new connected list
           $wpdb->insert( $wpdb->edd_mailchimp_lists, array(
             'remote_id'    => $list->id,
             'name'         => $list->name,
-            'is_default'   => 0,
+            'is_default'   => $is_default,
             'sync_status'  => 'unsynced',
             'connected_at' => current_time('mysql')
           ), array(
