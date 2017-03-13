@@ -169,11 +169,11 @@ class EDD_MailChimp_Settings {
     ?>
 
     <h2><?php _e('Connected Lists', 'eddmc'); ?></h2>
-    <p><?php _e('These are the MailChimp lists that are currently connected to Easy Digital Downloads.', 'eddmc'); ?></p>
 
     <?php if ( empty( $lists ) ) : ?>
-      <h2><?php _e('No Connected Lists.', 'eddmc'); ?></h2>
+      <p><?php _e('There are currently no MailChimp lists connected to Easy Digital Downloads.', 'eddmc'); ?></p>
     <?php else: ?>
+      <p><?php _e('These are the MailChimp lists that are currently connected to Easy Digital Downloads.', 'eddmc'); ?></p>
       <table class="is-edd-mailchimp-table is-edd-mailchimp-connected-lists-table form-table wp-list-table widefat fixed posts">
         <thead>
           <tr>
