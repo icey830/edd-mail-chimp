@@ -9,7 +9,7 @@ use \DrewM\MailChimp\MailChimp;
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       2.3
 */
-class EDD_MailChimp_Ecommerce extends EDD_MailChimp {
+class EDD_MailChimp_Ecommerce {
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'set_ecommerce360_session' ) );
