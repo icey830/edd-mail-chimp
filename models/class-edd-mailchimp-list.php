@@ -65,32 +65,47 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 
 
   /**
-   * Retrieve the MailChimp lists
+   * Fetch remote interests for a list.
    *
-   * Must return an array like this:
-   *   array(
-   *     'some_id'  => 'value1',
-   *     'other_id' => 'value2'
-   *   )
+   * @return [type] [description]
    */
-  private function _get_lists() {
-    $lists = array();
+  public function get_remote_interests() {
+    $all_category_data = array();
 
-    $list_data = get_transient( 'edd_mailchimp_list_data' );
+    $result = $this->api->get( $this->_resource . "/interest-categories", array( 'count' => 100 ) );
 
-    if( false === $list_data && ! empty( $this->api ) ) {
-      $list_data = $this->api->get('lists', array( 'count' => 100 ) );
-      set_transient( 'edd_mailchimp_list_data', $list_data, 24*24*24 );
-    }
+    if ( $this->api->success() && ! empty( $result['categories'] ) ) {
 
-    if( ! empty( $list_data ) ) {
-      foreach( $list_data['lists'] as $key => $list ) {
-        $lists[ $list['id'] ] = $list['name'];
+      foreach( $result['categories'] as $category ) {
+
+        $category_data = array(
+          'id'   => $category['id'],
+          'name' => $category['title'],
+          'interests' => array(),
+        );
+
+        $endpoint = $this->_resource . '/interest-categories/' . $category['id'] . '/interests';
+        $interests = $this->api->get( $endpoint, array( 'count' => 100 ) );
+
+        if ( $interests && ! empty( $interests['interests'] ) ) {
+          foreach ( $interests['interests'] as $interest ) {
+            $interest_id   = $interest['id'];
+            $interest_name = $interest['name'];
+
+            $interest_data = array(
+              'id'   => $interest['id'],
+              'name' => $interest['name'],
+            );
+
+            $category_data['interests'][] = $interest_data;
+          }
+        }
+
+        $all_category_data[] = $category_data;
       }
     }
 
-    return $lists;
+    return $all_category_data;
   }
-
 
 }
