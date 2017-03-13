@@ -198,7 +198,16 @@ class EDD_MailChimp_Settings {
 
           <td>
             <?php echo $list->sync_status; ?>
-            <span class="is-last-sync-date"><strong><?php _e('Last Synced', 'eddmc'); ?>:</strong> January 31st, 2017 at 4:12PM</span>
+            <span class="is-last-sync-date">
+              <strong><?php _e('Last Synced', 'eddmc'); ?>:</strong>
+              <?php
+                if ( $list->synced_at == '0000-00-00 00:00:00') {
+                  _e('Never', 'eddmc');
+                } else {
+                  echo date( 'F jS, Y \a\t g:iA', strtotime( $list->synced_at ) );
+                }
+              ?>
+            </span>
           </td>
 
           <td>
