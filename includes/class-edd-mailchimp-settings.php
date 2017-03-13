@@ -80,14 +80,34 @@ class EDD_MailChimp_Settings {
    * @return array $input modified input, if any
    */
   public function save_settings( $input ) {
-    // Flush the list transient on save
-    if ( isset( $input['eddmc_api'] ) ) {
-      delete_transient( 'edd_mailchimp_list_data' );
+
+    global $wpdb;
+
+    if ( isset( $input['eddmc_default_list'] ) ) {
+      $id = sanitize_key( $input['eddmc_default_list'] );
+
+      $wpdb->update(
+        $wpdb->edd_mailchimp_lists,
+        array(
+          'is_default' => '0'
+        ),
+        array( 'is_default' => 1 ),
+        array( '%d'),
+        array( '%d' )
+      );
+
+      $wpdb->update(
+        $wpdb->edd_mailchimp_lists,
+        array(
+          'is_default' => '1'
+        ),
+        array( 'remote_id' => $id ),
+        array( '%d'),
+        array( '%s' )
+      );
     }
 
     if ( isset( $input['eddmc_connect_lists'] ) && ! empty( $input['eddmc_connect_lists'] ) ) {
-      global $wpdb;
-
       foreach ( $input['eddmc_connect_lists'] as $list_id ) {
         $id = sanitize_key( $list_id );
 
@@ -152,6 +172,7 @@ class EDD_MailChimp_Settings {
       <table class="is-edd-mailchimp-table is-edd-mailchimp-connected-lists-table form-table wp-list-table widefat fixed posts">
         <thead>
           <tr>
+            <th><?php _e('Default', 'eddmc'); ?></th>
             <th><?php _e('Connected List Name', 'eddmc'); ?></th>
             <th><?php _e('Status', 'eddmc'); ?></th>
             <th><?php _e('Actions', 'eddmc'); ?></th>
@@ -161,13 +182,13 @@ class EDD_MailChimp_Settings {
         <?php $connected_list_ids[] = $list->remote_id; ?>
         <tr>
           <td>
+            <input type="radio" name="edd_settings[eddmc_default_list]" value="<?php esc_attr_e($list->remote_id); ?>" <?php checked( $list->is_default, 1 ); ?>  />
+          </td>
+          <td>
             <span class="is-mailchimp-list-name">
               <?php echo $list->name; ?>
             </span>
             <span class="is-mailchimp-list-id">ID: <?php echo $list->remote_id; ?></span>
-            <?php if ( (int) $list->is_default === 1 ): ?>
-              <span class="is-default-mailchimp-list"><?php _e('Default List', 'eddmc'); ?></span>
-            <?php endif; ?>
           </td>
 
           <td>
@@ -176,11 +197,7 @@ class EDD_MailChimp_Settings {
           </td>
 
           <td>
-            <?php if ( (int) $list->is_default === 0 ): ?>
-              <a href="#"><?php _e('Set as Default', 'eddmc'); ?></a> |
-            <?php endif; ?>
-            <a href="#"><?php _e('Force Sync Now', 'eddmc'); ?></a> |
-            <a href="#" style="color: #a00"><?php _e('Disconnect', 'eddmc'); ?></a>
+            <a href="#"><?php _e('Force Sync Now', 'eddmc'); ?></a>
           </td>
         </tr>
       <?php endforeach; ?>
@@ -195,8 +212,8 @@ class EDD_MailChimp_Settings {
       <table class="is-edd-mailchimp-table is-edd-mailchimp-lists-table form-table wp-list-table widefat fixed posts">
         <thead>
           <tr>
-            <th></th>
             <th><?php _e('MailChimp List Name', 'eddmc'); ?></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
