@@ -10,7 +10,7 @@ class EDD_MailChimp_Sync extends WP_Background_Process {
   /**
    * Task
    *
-   * Override this method to perform any actions required on each
+   * Perform any actions required on each
    * queue item. Return the modified item for further processing
    * in the next pass through. Or, return false to remove the
    * item from the queue.
@@ -69,12 +69,6 @@ class EDD_MailChimp_Sync extends WP_Background_Process {
         $batch    = $mailchimp->api->new_batch($batch_id);
         $result   = $batch->check_status();
 
-
-        error_log( 'Batch Status' ); 
-        error_log( print_r( $result, TRUE ) ); 
-        error_log('----------');
-
-
         // Set sync status based on MailChimp batch status
         $wpdb->update(
           $wpdb->edd_mailchimp_lists,
@@ -94,7 +88,7 @@ class EDD_MailChimp_Sync extends WP_Background_Process {
           case 'preprocessing':
           case 'started':
           case 'finalizing':
-
+            sleep(1);
             return $data;
 
           case 'finished':
