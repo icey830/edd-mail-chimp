@@ -28,7 +28,7 @@
   display: block; }
 
 .is-edd-mailchimp-table-container {
-  max-height: 20em; }
+  height: 20em; }
   .is-edd-mailchimp-table-container table {
     display: flex;
     flex-flow: column;
