@@ -137,7 +137,7 @@ class EDD_MailChimp_Settings {
             'remote_id'    => $list->id,
             'name'         => $list->name,
             'is_default'   => $is_default,
-            'sync_status'  => 'unsynced',
+            'sync_status'  => 'pending',
             'connected_at' => current_time('mysql')
           ), array(
             '%s', '%s', '%d', '%s', '%s'
