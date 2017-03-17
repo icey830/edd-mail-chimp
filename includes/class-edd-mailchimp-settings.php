@@ -102,7 +102,7 @@ class EDD_MailChimp_Settings {
 					'is_default' => '1'
 				),
 				array( 'remote_id' => $id ),
-				array( '%d'),
+				array( '%d' ),
 				array( '%s' )
 			);
 		}
@@ -111,40 +111,28 @@ class EDD_MailChimp_Settings {
 			foreach ( $input['eddmc_connect_lists'] as $list_id ) {
 				$id = sanitize_key( $list_id );
 
-				$list = new EDD_MailChimp_List($id);
+				$list = new EDD_MailChimp_List( $id );
 
 				if ( $list->exists() ) {
 					$response = $list->api->getLastResponse();
 					$list = json_decode( $response['body'] );
 
 					// Ensure it doesn't exist locally
-					$check = $wpdb->get_row( $wpdb->prepare(
-						"SELECT * FROM $wpdb->edd_mailchimp_lists WHERE remote_id = %s",
-						$list->id
-					) );
-
-					if ( $check !== null ) {
+					if ( $list->is_connected() ) {
 						continue;
 					}
 
 					// Determine if list should be set as default
 					// based on if another default list already exists.
-					$check = $wpdb->get_row("SELECT * FROM $wpdb->edd_mailchimp_lists WHERE is_default = 1");
-					$is_default = $check !== null ? 0 : 1;
+					$check = EDD_MailChimp_List::default();
+					$is_default = $check !== null ? false : true;
 
 					// Insert as new connected list
-					$wpdb->insert( $wpdb->edd_mailchimp_lists, array(
-						'remote_id'    => $list->id,
-						'name'         => $list->name,
-						'is_default'   => $is_default,
-						'sync_status'  => 'pending',
-						'connected_at' => current_time('mysql')
-					), array(
-						'%s', '%s', '%d', '%s', '%s'
-					) );
+					$list->connect( $is_default );
+					$list->sync_interests();
 
 					// Find or Create a MailChimp Store for this list and fire up a full sync job
-					$store = EDD_MailChimp_Store::find_or_create( $list->id );
+					$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 					$store->sync();
 				}
 			}
@@ -165,9 +153,8 @@ class EDD_MailChimp_Settings {
 		//   return;
 		// }
 
-		global $wpdb;
 		$connected_list_ids = array();
-		$lists = $wpdb->get_results("SELECT * FROM $wpdb->edd_mailchimp_lists");
+		$lists = EDD_MailChimp_List::connected();
 		?>
 
 		<h2><?php _e('Connected Lists', 'eddmc'); ?></h2>
