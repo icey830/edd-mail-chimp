@@ -40,7 +40,8 @@ class EDD_MailChimp_V3_Upgrade {
 	 */
 	public function __construct() {
 		add_action( 'admin_notices', array($this, 'show_upgrade_notices') );
-		add_action( 'edd_upgrade_mailchimp_groupings_settings', array($this, 'convert_grouping_data') );
+		add_action( 'edd_upgrade_mailchimp_api3', array($this, 'upgrade_to_api3') );
+		add_action( 'edd_upgrade_mailchimp_api3_groupings', array($this, 'convert_grouping_data') );
 	}
 
 
@@ -55,12 +56,59 @@ class EDD_MailChimp_V3_Upgrade {
 			return; // Don't show notices on the upgrades page
 		}
 
-		if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
+		if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_api3' ) ) {
 			printf(
 				'<div class="updated"><p>' . __( 'Easy Digital Downloads needs to upgrade your MailChimp settings, click <a href="%s">here</a> to start the upgrade.', 'eddmc' ) . '</p></div>',
-				esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_mailchimp_groupings_settings' ) )
+				esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_mailchimp_api3' ) )
 			);
 		}
+	}
+
+	/**
+	 * Init the upgrade process to API3
+	 *
+	 * @return void
+	 */
+	public function upgrade_to_api3() {
+
+		// Make sure the Global list has been connected first.
+		if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_api3_default_list' ) ) {
+			$this->connect_global_list();
+		}
+
+		$next_upgrade_url = admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_mailchimp_api3_groupings' );
+		self::redirect( $redirect );
+	}
+
+	/**
+	 * Move the user's global MailChimp list to a new connected list record
+	 * and peform a full sync on the corresponding store.
+	 *
+	 * @return [type] [description]
+	 */
+	public function connect_global_list() {
+		self::authorize_action();
+		self::authenticate_action();
+		self::configure_php_settings();
+
+		$list_id = edd_get_option('eddmc_list');
+
+		if ( $list_id ) {
+			$list = new EDD_MailChimp_List( $list_id );
+			$mark_as_default = true;
+			$list->connect( $mark_as_default );
+
+			$list->sync_interests();
+
+			// Find or Create a MailChimp Store for this list and fire up a full sync job
+			$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+			$store->sync();
+
+			edd_delete_option( 'eddmc_list' );
+		}
+
+		// Mark this one as done.
+		edd_set_upgrade_complete( 'upgrade_mailchimp_api3_default_list' );
 	}
 
 
@@ -71,15 +119,15 @@ class EDD_MailChimp_V3_Upgrade {
 	 * @return [type] [description]
 	 */
 	public function convert_grouping_data() {
-
 		self::authorize_action();
 		self::authenticate_action();
 		self::configure_php_settings();
 
-		$key = edd_get_option('eddmc_api');
-		$api = new MailChimp( trim( $key ) );
+		global $wpdb;
 
-		$this->step();
+		$api = new MailChimp( $this->key );
+
+		$this->set_step();
 		$this->products();
 		$this->total_products();
 
@@ -91,8 +139,6 @@ class EDD_MailChimp_V3_Upgrade {
 				if ( empty( $settings) ) {
 					continue;
 				}
-
-				$converted  = array();
 
 				foreach ( $settings as $index => $list ) {
 					if ( strpos( $list, '|' ) != false ) {
@@ -121,46 +167,63 @@ class EDD_MailChimp_V3_Upgrade {
 						$list_id        = $parts[0];
 						$interest_name  = $parts[2];
 
-						// .. call mailchimp api and get this list's interest categories ..
-						$interest_categories = $api->get( "lists/$list_id/interest-categories" );
+						// Connect the list locally and begin sync if not exists.
+						$list = new EDD_MailChimp_List( $list_id );
 
-						// If interest categories are present, fetch the interests
-						// that are children of each category.
-						if ( ! empty( $interest_categories['categories'] ) ) {
+						if ( ! $list->is_connected() ) {
+							$list->connect();
+							$list->sync_interests();
 
-							$categories = array();
+							// Also find/create the MailChimp Store
+							$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+							$store->sync();
+						}
 
-							foreach ( $interest_categories['categories'] as $interest_category ) {
-								$categories[$interest_category['id']] = $api->get( "lists/$list_id/interest-categories/".$interest_category['id']."/interests" );
-							}
+						// Compare the interest name to the stored group name
+						// If they are the same, migrate that over to the new post meta.
+						foreach ( $categories as $category ) {
+							foreach ( $category['interests'] as $interest ) {
+								if ( strtolower( $interest['name'] ) === strtolower( $interest_name ) ) {
 
-							// Compare the interest name to the stored group name
-							// If they are the same, migrate that over to the new post meta.
-							foreach ( $categories as $interest_category_id => $interests ) {
-								foreach ( $interests['interests'] as $interest ) {
-									if ( strtolower( $interest['name'] ) === strtolower( $interest_name ) ) {
-										$converted[] = sprintf('%1$s|%2$s', $list_id, $interest['id']);
-									}
+									// TODO: add $interest['id'] as as associated interest for $product->ID
+
 								}
 							}
 						}
 
-						// Store the list ID
-						$converted[] = $list_id;
-						delete_transient( 'edd_mailchimp_groupings_' . $list_id);
 					} else {
-						$converted[] = $list;
-						delete_transient( 'edd_mailchimp_groupings_' . $list);
+
+						// Connect the list locally and begin sync if not exists.
+						$list = new EDD_MailChimp_List( $list );
+
+						if ( ! $list->is_connected() ) {
+							$list->connect();
+							$list->sync_interests();
+							$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+							$store->sync();
+						}
+
 					}
+
+					delete_transient( 'edd_mailchimp_groupings_' . $list->remote_id);
+
+					// Assign this list as a download-specific preference.
+					$record = $list->get_record();
+
+					$wpdb->insert( $wpdb->edd_mailchimp_downloads_lists, array(
+						'download_id' => $product->ID,
+						'list_id'     => $record->id,
+					), array(
+						'%d', '%d'
+					) );
 				}
 
-				update_post_meta( $product->ID, '_edd_mailchimp', array_unique( $converted ) );
 			}
 
 			$this->step++;
 			$redirect = add_query_arg( array(
 				'page'        => 'edd-upgrades',
-				'edd-upgrade' => 'upgrade_mailchimp_groupings_settings',
+				'edd-upgrade' => 'upgrade_mailchimp_api3',
 				'step'        => $this->step,
 				'total'       => $this->total_products
 			), admin_url( 'index.php' ) );
@@ -203,6 +266,7 @@ class EDD_MailChimp_V3_Upgrade {
 			wp_die( __( 'Please make sure to set your MailChimp API key on the Easy Digital Downloads extension settings page and try running this upgrade again.', 'eddmc' ), __( 'Error', 'eddmc' ), array( 'response' => 403 ) );
 		}
 
+		$this->key = trim( $key );
 		return true;
 	}
 
@@ -224,7 +288,7 @@ class EDD_MailChimp_V3_Upgrade {
 	 *
 	 * @return class
 	 */
-	private function step() {
+	private function set_step() {
 		$this->step = isset( $_GET['step'] ) ? absint( $_GET['step'] ) : 1;
 		return $this;
 	}
@@ -266,8 +330,8 @@ class EDD_MailChimp_V3_Upgrade {
 	 * @return void
 	 */
 	private static function mark_as_complete() {
-		edd_set_upgrade_complete( 'upgrade_mailchimp_groupings_settings' );
-		delete_option( 'edd_doing_upgrade' );
+		edd_set_upgrade_complete( 'upgrade_mailchimp_api3' );
+		delete_site_option( 'edd_doing_upgrade' );
 	}
 
 
