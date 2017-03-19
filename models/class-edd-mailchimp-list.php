@@ -21,7 +21,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 	 *
 	 *   $default_list = EDD_MailChimp_List::default();
 	 *
-	 * @return mixed
+	 * @return mixed  EDD_MailChimp_List | null
 	 */
 	public static function default() {
 		global $wpdb;
@@ -43,7 +43,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 	 *
 	 *   $connected_lists = EDD_MailChimp_List::connected();
 	 *
-	 * @return mixed
+	 * @return array
 	 */
 	public static function connected() {
 		global $wpdb;
@@ -64,8 +64,8 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 	/**
 	 * Connect a list locally.
 	 *
-	 * @param  boolean $default [description]
-	 * @return [type]           [description]
+	 * @param  boolean $default Should this be specified as the default list?
+	 * @return EDD_MailChimp_List
 	 */
 	public function connect( $default = false ) {
 		global $wpdb;
@@ -143,7 +143,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 	/**
 	 * Sync a list's interests locally
 	 *
-	 * @return [type] [description]
+	 * @return boolean  Did it work?
 	 */
 	public function sync_interests() {
 		global $wpdb;
@@ -155,7 +155,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 		$interest_categories = $this->get_remote_interests();
 
 		if ( empty( $interest_categories ) ) {
-			return;
+			return true;
 		}
 
 		foreach ( $interest_categories as $category ) {
@@ -198,12 +198,14 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 
 			}
 		}
+
+		return true;
 	}
 
 	/**
 	 * Fetch remote interests for a list.
 	 *
-	 * @return [type] [description]
+	 * @return array
 	 */
 	public function get_remote_interests() {
 		$all_category_data = array();
@@ -248,7 +250,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 	/**
 	 * Sets the class `_record` property if the list has been connected locally.
 	 *
-	 * @return empty array | object
+	 * @return EDD_MailChimp_List
 	 */
 	private function _set_record() {
 		global $wpdb;
