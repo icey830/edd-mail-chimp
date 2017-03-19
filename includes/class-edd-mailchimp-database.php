@@ -140,6 +140,14 @@ class EDD_MailChimp_Database {
 		KEY `interest_remote_id` (`interest_remote_id`),
 		KEY `list_id` (`list_id`)
 		) CHARACTER SET utf8 COLLATE utf8_general_ci;
+		CREATE TABLE '.$wpdb->prefix.'edd_mailchimp_downloads_interests (
+		id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+		download_id bigint(20) unsigned NOT NULL,
+		interest_id bigint(20) unsigned NOT NULL,
+		PRIMARY KEY  (id),
+		KEY `download_id` (`download_id`),
+		KEY `interest_id` (`interest_id`)
+		) CHARACTER SET utf8 COLLATE utf8_general_ci;
 		';
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
