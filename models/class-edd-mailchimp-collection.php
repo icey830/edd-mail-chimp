@@ -43,7 +43,7 @@ class EDD_MailChimp_Collection extends EDD_MailChimp_API {
 	 *
 	 * @return 204 | Error
 	 */
-	public function delete( $object ) {
+	public function remove( $object ) {
 		$this->api->delete( $this->_resource );
 	}
 
