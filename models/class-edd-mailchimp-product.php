@@ -15,6 +15,34 @@ class EDD_MailChimp_Product extends EDD_MailChimp_Model {
 	}
 
 	/**
+	 * Remove all associated lists from this download.
+	 *
+	 * @return mixed  int | false
+	 */
+	public function clear_associated_lists() {
+		global $wpdb;
+		return $wpdb->delete(
+			$wpdb->edd_mailchimp_downloads_lists,
+			array( 'download_id' => $this->download->ID ),
+			array( '%d' )
+		);
+	}
+
+	/**
+	 * Remove all associated interests from this download.
+	 *
+	 * @return mixed  int | false
+	 */
+	public function clear_associated_interests() {
+		global $wpdb;
+		return $wpdb->delete(
+			$wpdb->edd_mailchimp_downloads_interests,
+			array( 'download_id' => $this->download->ID ),
+			array( '%d' )
+		);
+	}
+
+	/**
 	 * Assign the download which this product is associated with.
 	 *
 	 * @param mixed $list EDD_Download | int $download_id
