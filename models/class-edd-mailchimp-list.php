@@ -221,7 +221,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 	 */
 	public function interests() {
 		global $wpdb;
-		$local_id = $this->_record->id;
+		$local_id = $this->_record['id'];
 		return $wpdb->get_results("SELECT * FROM $wpdb->edd_mailchimp_interests WHERE list_id = $local_id");
 	}
 
@@ -344,7 +344,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 		$result = $wpdb->get_row( $wpdb->prepare(
 			"SELECT * FROM $wpdb->edd_mailchimp_lists WHERE remote_id = %s LIMIT 1",
 			$this->remote_id
-		) );
+		), ARRAY_A );
 
 		if ( $result !== null ) {
 			$this->_record = $result;
