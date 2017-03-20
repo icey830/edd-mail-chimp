@@ -29,26 +29,40 @@ class EDD_MailChimp_Metabox {
 
 		echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing.', 'eddmc' ) . '</p>';
 
-		$checked = (array) get_post_meta( $post->ID, '_edd_mailchimp', true );
+		$lists = EDD_MailChimp_List::connected();
+		$associated_lists = EDD_MailChimp_List::associated_with_download( $post->ID );
 
-		foreach( $this->_get_lists() as $list_id => $list_name ) {
+		$associated_list_ids = array();
+
+		foreach ( $associated_lists as $list ) {
+			$associated_list_ids[] = $list->id;
+		}
+
+		foreach( $lists as $list ) {
 			echo '<label>';
-				echo '<input type="checkbox" name="_edd_mailchimp' . '[]" value="' . esc_attr( $list_id ) . '"' . checked( true, in_array( $list_id, $checked ), false ) . '>';
-				echo '&nbsp;' . $list_name;
+				echo '<input type="checkbox" name="_edd_mailchimp_lists' . '[]" value="' . esc_attr( $list->id ) . '"' . checked( true, in_array( $list->id, $associated_list_ids ), false ) . '>';
+				echo '&nbsp;' . $list->name;
 			echo '</label><br/>';
 
-			$interests = $this->_get_interests( $list_id );
-			if( ! empty( $interests ) ) {
-				foreach ( $interests as $interest_id => $interest_name ){
+			$interests = $list->interests();
+			$associated_interests = EDD_MailChimp_List::interests_associated_with_download( $post->ID );
+
+			$associated_interest_ids = array();
+
+			foreach ( $associated_interests as $interest ) {
+				$associated_interest_ids[] = $interest->id;
+			}
+
+			if ( ! empty( $interests ) ) {
+				foreach ( $interests as $interest ){
 					echo '<label>';
-						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="_edd_mailchimp[]" value="' . esc_attr( $interest_id ) . '"' . checked( true, in_array( $interest_id, $checked ), false ) . '>';
-						echo '&nbsp;' . $interest_name;
+						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="_edd_mailchimp_interests[]" value="' . esc_attr( $interest->id ) . '"' . checked( true, in_array( $interest->id, $associated_interest_ids ), false ) . '>';
+						echo '&nbsp;' . $interest->interest_name;
 					echo '</label><br/>';
 				}
 			}
 		}
 	}
-
 
 	/**
 	 * Add metabox fields that should be saved to the post meta
