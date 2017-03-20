@@ -101,6 +101,14 @@ class EDD_MailChimp {
 		  $wpdb->edd_mailchimp_downloads_lists = $wpdb->prefix . 'edd_mailchimp_downloads_lists';
 		}
 
+		if ( ! isset( $wpdb->edd_mailchimp_interests ) ) {
+		  $wpdb->edd_mailchimp_interests = $wpdb->prefix . 'edd_mailchimp_interests';
+		}
+
+		if ( ! isset( $wpdb->edd_mailchimp_downloads_interests ) ) {
+		  $wpdb->edd_mailchimp_downloads_interests = $wpdb->prefix . 'edd_mailchimp_downloads_interests';
+		}
+
 		define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
 		define( 'EDD_MAILCHIMP_VERSION', '2.5.6' );
 		define( 'EDD_MAILCHIMP_URL',  plugin_dir_url(__FILE__) );
