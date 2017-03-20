@@ -109,6 +109,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 		) );
 
 		$this->_set_record();
+		$this->sync_interests();
 		return $this;
 	}
 

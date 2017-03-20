@@ -129,7 +129,6 @@ class EDD_MailChimp_Settings {
 
 					// Insert as new connected list
 					$list->connect( $is_default );
-					$list->sync_interests();
 
 					// Find or Create a MailChimp Store for this list and fire up a full sync job
 					$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );

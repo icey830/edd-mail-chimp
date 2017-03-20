@@ -98,8 +98,6 @@ class EDD_MailChimp_V3_Upgrade {
 			$mark_as_default = true;
 			$list->connect( $mark_as_default );
 
-			$list->sync_interests();
-
 			// Find or Create a MailChimp Store for this list and fire up a full sync job
 			$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 			$store->sync();
@@ -172,7 +170,6 @@ class EDD_MailChimp_V3_Upgrade {
 
 						if ( ! $list->is_connected() ) {
 							$list->connect();
-							$list->sync_interests();
 
 							// Also find/create the MailChimp Store
 							$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
@@ -198,7 +195,6 @@ class EDD_MailChimp_V3_Upgrade {
 
 						if ( ! $list->is_connected() ) {
 							$list->connect();
-							$list->sync_interests();
 							$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 							$store->sync();
 						}
