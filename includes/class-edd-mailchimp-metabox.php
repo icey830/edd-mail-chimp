@@ -7,7 +7,7 @@ class EDD_MailChimp_Metabox {
 
 	public function __construct() {
 		add_action( 'add_meta_boxes', array( $this, 'add_metabox' ) );
-		add_filter( 'edd_metabox_fields_save', array( $this, 'save_metabox' ) );
+		add_filter( 'edd_save_download', array( $this, 'save_metabox' ) );
 	}
 
 	/**
