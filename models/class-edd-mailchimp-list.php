@@ -172,7 +172,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 
 		$result = $wpdb->insert( $wpdb->edd_mailchimp_downloads_lists, array(
 			'download_id' => $klass->ID,
-			'list_id'     => $this->_record->id,
+			'list_id'     => $this->id,
 		), array(
 			'%d', '%d'
 		) );
@@ -183,7 +183,6 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 
 		return false;
 	}
-
 
 	/**
 	 * Fetch all of the associated interests for a connected list.
@@ -258,6 +257,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 
 		return true;
 	}
+
 
 	/**
 	 * Fetch remote interests for a list.
