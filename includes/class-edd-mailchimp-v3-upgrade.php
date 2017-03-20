@@ -2,12 +2,10 @@
 /**
  * Upgrade database to v3 class.
  *
- * @copyright   Copyright (c) 2016, Dave Kiss
+ * @copyright   Copyright (c) 2017, Dave Kiss
  * @license     http://opensource.org/licenses/gpl-3.0.php GNU Public License
  * @since       2.6
 */
-
-use \DrewM\MailChimp\MailChimp;
 
 class EDD_MailChimp_V3_Upgrade {
 
