@@ -39,6 +39,8 @@ class EDD_MailChimp_Metabox {
 		}
 
 		foreach( $lists as $list ) {
+			$list = new EDD_MailChimp_List( $list->remote_id );
+
 			echo '<label>';
 				echo '<input type="checkbox" name="_edd_mailchimp_lists' . '[]" value="' . esc_attr( $list->id ) . '"' . checked( true, in_array( $list->id, $associated_list_ids ), false ) . '>';
 				echo '&nbsp;' . $list->name;
