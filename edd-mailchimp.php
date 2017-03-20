@@ -133,6 +133,7 @@ class EDD_MailChimp {
 		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-cart.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-customer.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-list.php' );
+		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-interest.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-order.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-product.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-store.php' );
