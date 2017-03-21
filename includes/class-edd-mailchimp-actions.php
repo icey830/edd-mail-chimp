@@ -6,12 +6,30 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class EDD_MailChimp_Actions {
 
 	public function __construct() {
-		// add_action( 'edd_download_post_create', array( $this, 'create_download' ) );
+		add_action( 'edd_download_post_create', array( $this, 'create_product' ), 10, 2 );
 		// add_action( 'edd_customer_post_create', array( $this, 'create_customer' ) );
 		// add_action( 'edd_cart_contents_loaded_from_session', array( $this, 'set_cart' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_scripts') );
 		add_action( 'edd_complete_download_purchase', array( $this, 'hook_signup' ), 10, 3 );
 	}
+
+	/**
+	 * Create product in MailChimp Store for each connected list.
+	 *
+	 * @param  int    $id   Download ID
+	 * @param  array  $args The post object arguments used for creation.
+	 * @return void
+	 */
+	public function create_product( $id, $args ) {
+		$product = new EDD_MailChimp_Product( $id );
+		$lists = EDD_MailChimp_List::connected();
+
+		foreach( $lists as $list ) {
+			$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+			$store->products->add( $product );
+		}
+	}
+
 
 	/**
 	 * Backwards compatibility to add an action for signups
