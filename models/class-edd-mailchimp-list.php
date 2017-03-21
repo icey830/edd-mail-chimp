@@ -39,32 +39,6 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 
 
 	/**
-	 * Find all lists associated with the given download ID.
-	 *
-	 * @param  mixed $download  int | EDD_Download
-	 * @return array
-	 */
-	public static function associated_with_download( $download ) {
-		if ( is_integer( $download ) ) {
-			$klass = new EDD_Download( $download );
-		} elseif ( is_object( $download ) && get_class( $download ) === 'EDD_Download' ) {
-			$klass = $download;
-		}
-
-		global $wpdb;
-
-		return $wpdb->get_results( $wpdb->prepare(
-			"SELECT lists.remote_id, lists.name, lists.is_default
-			FROM $wpdb->edd_mailchimp_lists lists
-			LEFT JOIN $wpdb->edd_mailchimp_downloads_lists dl
-			ON dl.list_id = lists.id
-			WHERE dl.download_id = %d",
-			$klass->ID
-		) );
-	}
-
-
-	/**
 	 * Fetch all lists that have been connected locally.
 	 *
 	 *   $connected_lists = EDD_MailChimp_List::connected();
@@ -154,35 +128,6 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 		return false;
 	}
 
-	/**
-	 * Associate the current list with the provided EDD Download.
-	 *
-	 * @param  mixed $download  int | EDD_Download
-	 * @return mixed            int insert_id | false
-	 */
-	public function associate_with_download( $download ) {
-
-		if ( is_integer( $download ) ) {
-			$klass = new EDD_Download( $download );
-		} elseif ( is_object( $download ) && get_class( $download ) === 'EDD_Download' ) {
-			$klass = $download;
-		}
-
-		global $wpdb;
-
-		$result = $wpdb->insert( $wpdb->edd_mailchimp_downloads_lists, array(
-			'download_id' => $klass->ID,
-			'list_id'     => $this->id,
-		), array(
-			'%d', '%d'
-		) );
-
-		if ( $result ) {
-			return $wpdb->insert_id;
-		}
-
-		return false;
-	}
 
 	/**
 	 * Fetch all of the associated interests for a connected list.
