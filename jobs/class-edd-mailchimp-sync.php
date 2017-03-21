@@ -80,7 +80,7 @@ class EDD_MailChimp_Sync extends WP_Background_Process {
 
 				// Set job status here to whatever based on MailChimp job results
 
-				// TODO: You can log total_operations as soon batch has reached *started* status
+				// @todo You can log total_operations as soon batch has reached *started* status
 				// Everything else should wait until finished.
 				switch( $result['status'] ) {
 

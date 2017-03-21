@@ -23,7 +23,7 @@ class EDD_MailChimp_Collection extends EDD_MailChimp_API {
 	/**
 	 * Adds an object to a parent collection.
 	 *
-	 * Todo: consider returning the object class, eg. EDD_MailChimp_Product
+	 * @todo consider returning the object class, eg. EDD_MailChimp_Product
 	 *
 	 * @return array
 	 */

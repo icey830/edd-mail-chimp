@@ -66,7 +66,7 @@ class EDD_MailChimp_Ecommerce {
 		$campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
 		$email_id    = get_post_meta( $payment_id, '_edd_mc_email_id', true );
 
-		// TODO: Fetch unique email address for customer using the ecommerce tracking email id?
+		// @todo Fetch unique email address for customer using the ecommerce tracking email id?
 
 		if ( ! empty( $campaign_id ) ) {
 			$order['campaign_id'] = $campaign_id;

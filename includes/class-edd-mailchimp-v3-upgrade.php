@@ -174,7 +174,7 @@ class EDD_MailChimp_V3_Upgrade {
 							// Also find/create the MailChimp Store
 							$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 
-							// TODO: Make sure multiple store sync jobs can be queued at the same time.
+							// @todo Make sure multiple store sync jobs can be queued at the same time.
 							$store->sync();
 						}
 
