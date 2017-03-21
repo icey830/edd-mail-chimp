@@ -6,7 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 class EDD_MailChimp_Actions {
 
 	public function __construct() {
-		add_action( 'edd_download_post_create', array( $this, 'create_product' ), 10, 2 );
+		add_action( 'save_post_download', array( $this, 'create_product' ), 10, 3 );
 		add_action( 'edd_customer_post_create', array( $this, 'create_customer' ), 10, 2 );
 		// add_action( 'edd_cart_contents_loaded_from_session', array( $this, 'set_cart' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_scripts') );
@@ -16,11 +16,16 @@ class EDD_MailChimp_Actions {
 	/**
 	 * Create product in MailChimp Store for each connected list.
 	 *
-	 * @param  int    $id   Download ID
-	 * @param  array  $args The post object arguments used for creation.
+	 * @param int     $id Download ID.
+	 * @param WP_Post $post    Download object.
+	 * @param bool    $update  Whether this is an existing post being updated or not.
 	 * @return void
 	 */
-	public function create_product( $id, $args ) {
+	public function create_product( $id, $post, $update ) {
+		if ( $post->post_status !== 'publish' ) {
+			return;
+		}
+
 		$product = new EDD_MailChimp_Product( $id );
 		$lists = EDD_MailChimp_List::connected();
 
