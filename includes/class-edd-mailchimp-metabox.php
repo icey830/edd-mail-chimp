@@ -29,36 +29,37 @@ class EDD_MailChimp_Metabox {
 
 		echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing.', 'eddmc' ) . '</p>';
 
-		$lists = EDD_MailChimp_List::connected();
-		$associated_lists = EDD_MailChimp_List::associated_with_download( (int) $post->ID );
+		$connected_lists = EDD_MailChimp_List::connected();
+		$download = new EDD_MailChimp_Download( (int) $post->ID );
+		$preferences = $download->subscription_preferences();
 
-		$associated_list_ids = array();
+		$preferred_list_ids = array();
+		$preferred_interest_ids = array();
 
-		foreach ( $associated_lists as $list ) {
-			$associated_list_ids[] = $list->remote_id;
+		foreach ( $preferences as $list ) {
+			$preferred_list_ids[] = $list['id'];
+
+			if ( ! empty( $list['interests'] ) ) {
+				foreach( $list['interests'] as $interest ) {
+					$preferred_interest_ids[] = $interest['id'];
+				}
+			}
 		}
 
-		foreach( $lists as $list ) {
+		foreach( $connected_lists as $list ) {
 			$list = new EDD_MailChimp_List( $list->remote_id );
 
 			echo '<label>';
-				echo '<input type="checkbox" name="edd_mailchimp_lists' . '[]" value="' . esc_attr( $list->remote_id ) . '"' . checked( true, in_array( $list->remote_id, $associated_list_ids ), false ) . '>';
+				echo '<input type="checkbox" name="edd_mailchimp_lists' . '[]" value="' . esc_attr( $list->id ) . '"' . checked( true, in_array( $list->id, $preferred_list_ids ), false ) . '>';
 				echo '&nbsp;' . $list->name;
 			echo '</label><br/>';
 
 			$interests = $list->interests();
-			$associated_interests = EDD_MailChimp_Interest::associated_with_download( (int) $post->ID );
-
-			$associated_interest_ids = array();
-
-			foreach ( $associated_interests as $interest ) {
-				$associated_interest_ids[] = $interest->interest_remote_id;
-			}
 
 			if ( ! empty( $interests ) ) {
 				foreach ( $interests as $interest ){
 					echo '<label>';
-						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="edd_mailchimp_interests[]" value="' . esc_attr( $interest->interest_remote_id ) . '"' . checked( true, in_array( $interest->interest_remote_id, $associated_interest_ids ), false ) . '>';
+						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="edd_mailchimp_interests[]" value="' . esc_attr( $interest->id ) . '"' . checked( true, in_array( $interest->id, $preferred_interest_ids ), false ) . '>';
 						echo '&nbsp;' . $interest->interest_name;
 					echo '</label><br/>';
 				}
@@ -74,30 +75,23 @@ class EDD_MailChimp_Metabox {
 	 * @return [type]          [description]
 	 */
 	public function save_metabox( $post_id, $post ) {
-		$product = new EDD_MailChimp_Product( $post_id );
+		$download = new EDD_MailChimp_Download( $post_id );
 
 		if ( isset( $_POST['edd_mailchimp_lists'] ) && ! empty( $_POST['edd_mailchimp_lists'] ) ) {
-			$product->clear_associated_lists();
+			$download->clear_subscription_preferences();
 
-			foreach ( $_POST['edd_mailchimp_lists'] as $remote_list_id ) {
-				$remote_list_id = sanitize_key( $remote_list_id );
+			foreach ( $_POST['edd_mailchimp_lists'] as $list_id ) {
+				$list_id = absint( $list_id );
+				$download->add_preferred_list( $list_id );
+			}
 
-				$list = new EDD_MailChimp_List( $remote_list_id );
-				$list->associate_with_download( $post_id );
+			if ( isset( $_POST['edd_mailchimp_interests'] ) && ! empty( $_POST['edd_mailchimp_interests'] ) ) {
+				foreach ( $_POST['edd_mailchimp_interests'] as $interest_id ) {
+					$interest_id = absint( $interest_id );
+					$download->add_preferred_interest( $interest_id );
+				}
 			}
 		}
-
-		if ( isset( $_POST['edd_mailchimp_interests'] ) && ! empty( $_POST['edd_mailchimp_interests'] ) ) {
-			$product->clear_associated_interests();
-
-			foreach ( $_POST['edd_mailchimp_interests'] as $remote_interest_id ) {
-				$remote_interest_id = sanitize_key( $remote_interest_id );
-
-				$interest = new EDD_MailChimp_Interest( $remote_interest_id );
-				$interest->associate_with_download( $post_id );
-			}
-		}
-
 	}
 
 }
