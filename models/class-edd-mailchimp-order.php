@@ -35,6 +35,8 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 	 * @return [type] [description]
 	 */
 	protected function _build() {
+		$customer = new EDD_MailChimp_Customer( $this->_payment->customer_id );
+
 		$order = array(
 			'id'       => (string) $this->_payment->number,
 			'customer' => array(
@@ -44,8 +46,8 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 				// 'company'       => '',
 				'first_name'    => $this->_payment->first_name,
 				'last_name'     => $this->_payment->last_name,
-				'orders_count'  => '',
-				'total_spent'   => '',
+				'orders_count'  => $customer->orders_count,
+				'total_spent'   => $customer->total_spent,
 				// 'address'       => array(
 				//   'address1'      => '',
 				//   'address2'      => '',
