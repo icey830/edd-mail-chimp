@@ -40,67 +40,31 @@ class EDD_MailChimp_Actions {
 	 * Check if a customer needs to be subscribed on completed purchase of specific products
 	 */
 	public function completed_purchase_signup( $payment_id = 0 ) {
+		$payment = new EDD_Payment( $payment_id );
 
-		$user_info = edd_get_payment_meta_user_info( $payment_id );
-		$downloads = edd_get_payment_meta_cart_details( $payment_id, true );
+		$user = array(
+			'first_name' => $payment->first_name,
+			'last_name'  => $payment->last_name,
+			'email'      => $payment->email,
+		);
 
-		$entries = array();
+		$default_list = EDD_MailChimp_List::default();
 
-		foreach ( $downloads as $download ) {
-			$download_lists = get_post_meta( $download['id'], '_edd_mailchimp', true );
-
-			if ( is_array( $download_lists ) ) {
-				$entries = array_merge( $download_lists, $entries );
-			}
+		if ( $default_list ) {
+			$default_list->subscribe( $user_info );
 		}
 
-		if( empty( $entries ) ) {
-			return;
-		}
 
-		$entries = array_unique( $entries );
+		foreach ( $payment->cart_details as $line ) {
+			$download = new EDD_MailChimp_Download( (int) $line['id'] );
+			$preferences = $download->subscription_preferences();
 
-		// Convert, combine and break out any interests into lists and interest array
-		$lists = array();
-
-		foreach( $entries as $list ) {
-
-			if ( strpos( $list, '|' ) != false ) {
-				$parts          = explode( '|', $list );
-				$list_id        = $parts[0];
-				$interest_id    = $parts[1];
-			} else {
-				$list_id = $list;
-			}
-
-			if ( ! isset( $lists[$list_id] ) ) {
-				$lists[$list_id] = array();
-			}
-
-			if ( isset( $interest_id ) ) {
-				$lists[$list_id][$interest_id] = true;
+			foreach( $preferences as $preference ) {
+				$list = new EDD_MailChimp_List( $preference['remote_id'] );
+				$options = array( 'interests' => $preference['interests'] );
+				$list->subscribe( $user, $options );
 			}
 		}
-
-		foreach( $lists as $list => $interests ) {
-			// $list = new EDD_Mailchimp_List;
-			// $list->subscribe( ... );
-			$this->subscribe_email( $user_info, $list, false, array('interests' => $interests) );
-		}
-	}
-
-
-	/**
-	 * Subscribe an email to a list
-	 *
-	 * @param  array   $user_info       Customer data containing the user ID, email, first name, and last name
-	 * @param  boolean $list_id         MailChimp List ID to subscribe the user to
-	 * @param  boolean $opt_in_override Should we force double opt-in for this subscription?
-	 * @param  boolean $options         Additional subscription options
-	 * @return boolean                  Was the customer subscribed?
-	 */
-	public function subscribe_email( $user_info = array(), $list_id = false, $opt_in_override = false, $options = array() ) {
-		return;
 	}
 
 }
