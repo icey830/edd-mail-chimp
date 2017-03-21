@@ -136,6 +136,8 @@ class EDD_MailChimp_V3_Upgrade {
 					continue;
 				}
 
+				$download = new EDD_MailChimp_Download( (int) $product->ID );
+
 				foreach ( $settings as $index => $list ) {
 					if ( strpos( $list, '|' ) != false ) {
 
@@ -171,18 +173,18 @@ class EDD_MailChimp_V3_Upgrade {
 
 							// Also find/create the MailChimp Store
 							$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+
+							// TODO: Make sure multiple store sync jobs can be queued at the same time.
 							$store->sync();
 						}
 
+						$interests = $list->interests();
+
 						// Compare the interest name to the stored group name
 						// If they are the same, migrate that over to the new post meta.
-						foreach ( $categories as $category ) {
-							foreach ( $category['interests'] as $interest ) {
-								if ( strtolower( $interest['name'] ) === strtolower( $interest_name ) ) {
-
-									// TODO: add $interest['id'] as as associated interest for $product->ID
-
-								}
+						foreach ( $interests as $interest ) {
+							if ( strtolower( $interest->interest_name ) === strtolower( $interest_name ) ) {
+								$download->add_preferred_interest( $interest->id );
 							}
 						}
 
@@ -202,14 +204,7 @@ class EDD_MailChimp_V3_Upgrade {
 					delete_transient( 'edd_mailchimp_groupings_' . $list->remote_id);
 
 					// Assign this list as a download-specific preference.
-					$record = $list->get_record();
-
-					$wpdb->insert( $wpdb->edd_mailchimp_downloads_lists, array(
-						'download_id' => $product->ID,
-						'list_id'     => $record->id,
-					), array(
-						'%d', '%d'
-					) );
+					$download->add_preferred_list( $list->id );
 				}
 
 			}
