@@ -31,10 +31,10 @@ class EDD_MailChimp_Collection extends EDD_MailChimp_API {
 		$this->_set_resource($object);
 
 		if ( $object->exists() ) {
-			return $object;
+			return $this->api->patch( $this->_endpoint, $object->get_record() );
+		} else {
+			return $this->api->post( $this->_endpoint, $object->get_record() );
 		}
-
-		return $this->api->post( $this->_endpoint, $object->get_record() );
 	}
 
 
