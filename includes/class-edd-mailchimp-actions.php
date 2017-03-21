@@ -7,7 +7,7 @@ class EDD_MailChimp_Actions {
 
 	public function __construct() {
 		add_action( 'edd_download_post_create', array( $this, 'create_product' ), 10, 2 );
-		// add_action( 'edd_customer_post_create', array( $this, 'create_customer' ) );
+		add_action( 'edd_customer_post_create', array( $this, 'create_customer' ), 10, 2 );
 		// add_action( 'edd_cart_contents_loaded_from_session', array( $this, 'set_cart' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_scripts') );
 		add_action( 'edd_complete_download_purchase', array( $this, 'hook_signup' ), 10, 3 );
@@ -27,6 +27,28 @@ class EDD_MailChimp_Actions {
 		foreach( $lists as $list ) {
 			$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 			$store->products->add( $product );
+		}
+	}
+
+
+	/**
+	 * Create customer in MailChimp Store for each connected list.
+	 *
+	 * @param int   $id      If created successfully, the customer ID.  Defaults to false.
+	 * @param array $args    Contains customer information such as payment ID, name, and email.
+	 * @return void
+	 */
+	public function create_customer( $id, $args ) {
+		if ( ! $id ) {
+			return false;
+		}
+
+		$customer = new EDD_MailChimp_Customer( $id );
+		$lists = EDD_MailChimp_List::connected();
+
+		foreach( $lists as $list ) {
+			$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+			$store->customers->add( $customer );
 		}
 	}
 
