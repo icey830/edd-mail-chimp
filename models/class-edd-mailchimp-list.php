@@ -93,8 +93,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 	 *
 	 * @return [type] [description]
 	 */
-	public function subscribe() {
-		return;
+	public function subscribe( $user_info = array(), $options = array() ) {
 
 		// Make sure an API key and list ID has been entered
 		if ( empty( $this->api ) || ! $this->remote_id ) {
@@ -102,30 +101,25 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 		}
 
 		$opt_in = edd_get_option('eddmc_double_opt_in');
-
-		if ( $opt_in_override ) {
-			$opt_in = true;
-		}
-
 		$status = $opt_in ? 'pending' : 'subscribed';
 
-		$merge_fields = array( 'FNAME' => $user_info['first_name'], 'LNAME' => $user_info['last_name'] );
-		$interests = isset( $options['interests'] ) ? $options['interests'] : array();
+		$merge_fields = array(
+			'FNAME' => $user_info['first_name'],
+			'LNAME' => $user_info['last_name']
+		);
 
+		$interests = isset( $options['interests'] ) ? $options['interests'] : array();
 		$subscriber_hash = $this->api->subscriberHash( $user_info['email'] );
 
-		$result = $this->api->put("lists/$list_id/members/$subscriber_hash", apply_filters( 'edd_mc_subscribe_vars', array(
+		$payload = apply_filters( 'edd_mc_subscribe_vars', array(
 			'email_address' => $user_info['email'],
 			'status_if_new' => $status,
 			'merge_fields'  => $merge_fields,
 			'interests'     => $interests,
-		) ));
+		) );
 
-		if( $result ) {
-			return true;
-		}
-
-		return false;
+		$this->api->put( $this->_resource . "/members/$subscriber_hash", $payload );
+		return $this->api->success();
 	}
 
 
