@@ -146,11 +146,11 @@ class EDD_MailChimp_Settings {
 	 * @return void
 	 */
 	public function connected_lists() {
-		// $key = edd_get_option('eddmc_api', false);
+		$key = edd_get_option('eddmc_api', false);
 
-		// if ( ! $key ) {
-		//   return;
-		// }
+		if ( ! $key ) {
+		  return;
+		}
 
 		$connected_list_ids = array();
 		$lists = EDD_MailChimp_List::connected();
