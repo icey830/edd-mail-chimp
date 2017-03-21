@@ -82,10 +82,11 @@ class EDD_MailChimp_Ecommerce {
 			}
 
 			foreach( $order->lines as $line_item ) {
-				$lists = EDD_MailChimp_List::associated_with_download( $line_item['product_id'] );
+				$download = new EDD_MailChimp_Download( (int) $line_item['product_id'] );
+				$preferences = $download->subscription_preferences();
 
-				if ( ! empty( $lists ) ) {
-					foreach( $lists as $list ) {
+				if ( ! empty( $preferences ) ) {
+					foreach( $preferences as $list ) {
 						$list = new EDD_MailChimp_List( $list['remote_id'] );
 						$store = EDD_MailChimp_Store::find_or_create( $list );
 						$store->orders->add( $order );
@@ -127,10 +128,11 @@ class EDD_MailChimp_Ecommerce {
 			}
 
 			foreach( $order->lines as $line_item ) {
-				$lists = EDD_MailChimp_List::associated_with_download( $line_item['product_id'] );
+				$download = new EDD_MailChimp_Download( (int) $line_item['product_id'] );
+				$preferences = $download->subscription_preferences();
 
-				if ( ! empty( $lists ) ) {
-					foreach( $lists as $list ) {
+				if ( ! empty( $preferences ) ) {
+					foreach( $preferences as $list ) {
 						$list = new EDD_MailChimp_List( $list['remote_id'] );
 						$store = EDD_MailChimp_Store::find_or_create( $list );
 						$store->orders->remove( $order );
