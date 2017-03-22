@@ -60,7 +60,7 @@ class EDD_MailChimp_Ecommerce {
 			return;
 		}
 
-		$order = new EDD_MailChimp_Order( $payment_id );
+		$order = new EDD_MailChimp_Order( (int) $payment_id );
 
 		// Set Ecommerce360 variables if they exist
 		$campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
