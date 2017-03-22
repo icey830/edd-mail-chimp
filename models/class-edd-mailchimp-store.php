@@ -147,6 +147,24 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
 		$results = $wpdb->get_row( $total_sql, 0 );
 		$pages   = ceil( $results->total / $batch_size );
 
+		// No work to be done? Don't schedule a job.
+		if ( $pages == 0 ) {
+
+			$wpdb->update(
+				$wpdb->edd_mailchimp_lists,
+				array(
+					'sync_status' => 'finished',
+					'synced_at' => current_time( 'mysql' )
+				),
+				array( 'remote_id' => $data['payload']['list_id'] ),
+				array( '%s', '%s' ),
+				array( '%s' )
+			);
+
+			$this->is_syncing( false );
+			return;
+		}
+
 		// Init the job class
 		$job = new EDD_MailChimp_Sync;
 
