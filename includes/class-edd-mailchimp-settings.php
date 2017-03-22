@@ -115,12 +115,14 @@ class EDD_MailChimp_Settings {
 
 				if ( $list->exists() ) {
 					$response = $list->api->getLastResponse();
-					$list = json_decode( $response['body'] );
+					$response = json_decode( $response['body'] );
 
 					// Ensure it doesn't exist locally
 					if ( $list->is_connected() ) {
 						continue;
 					}
+
+					$list->name = $response->name;
 
 					// Determine if list should be set as default
 					// based on if another default list already exists.
