@@ -130,7 +130,7 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
 			case '':
 			case 'products':
 				$sync_type = 'products';
-				$total_sql = "SELECT COUNT(ID) as total FROM $wpdb->posts WHERE post_type = 'download'";
+				$total_sql = "SELECT COUNT(ID) as total FROM $wpdb->posts WHERE post_type = 'download' AND post_status = 'publish'";
 				$edd_wrapper_class_name = 'EDD_Download';
 				$edd_mailchimp_model_name = 'EDD_MailChimp_Product';
 				break;

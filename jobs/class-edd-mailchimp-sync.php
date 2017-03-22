@@ -158,6 +158,7 @@ class EDD_MailChimp_Sync extends WP_Background_Process {
 					"SELECT ID
 					FROM $wpdb->posts
 					WHERE post_type = 'download'
+					AND post_status = 'publish'
 					ORDER BY post_date DESC
 					LIMIT %d,%d;",
 					$offset,
