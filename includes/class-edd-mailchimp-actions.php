@@ -96,7 +96,7 @@ class EDD_MailChimp_Actions {
 		$default_list = EDD_MailChimp_List::default();
 
 		if ( $default_list ) {
-			$default_list->subscribe( $user_info );
+			$result = $default_list->subscribe( $user );
 		}
 
 
