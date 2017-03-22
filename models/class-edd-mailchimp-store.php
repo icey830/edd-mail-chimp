@@ -139,6 +139,7 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
 				$total_sql = "SELECT COUNT(ID) as total FROM $wpdb->posts WHERE post_type = 'edd_payment'";
 				$edd_wrapper_class_name = 'EDD_Payment';
 				$edd_mailchimp_model_name = 'EDD_MailChimp_Order';
+				break;
 			default:
 				return false;
 		}
