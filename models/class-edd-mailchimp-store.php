@@ -60,7 +60,7 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
 		} elseif ( is_string( $list ) ) {
 			$this->list_id = $list;
 		} elseif ( is_object( $list ) && get_class( $list ) === 'EDD_MailChimp_List' ) {
-			$this->list_id = $list->id;
+			$this->list_id = $list->remote_id;
 		}
 	}
 
