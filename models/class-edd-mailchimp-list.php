@@ -108,17 +108,29 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 			'LNAME' => $user_info['last_name']
 		);
 
-		$interests = isset( $options['interests'] ) ? $options['interests'] : array();
-		$subscriber_hash = $this->api->subscriberHash( $user_info['email'] );
+		$interests = array();
 
-		$payload = apply_filters( 'edd_mc_subscribe_vars', array(
+		if ( isset( $options['interests'] ) ) {
+			foreach( $options['interests'] as $interest ) {
+				$interests[$interest['remote_id']] = true;
+			}
+		}
+
+		$args = array(
 			'email_address' => $user_info['email'],
 			'status_if_new' => $status,
 			'merge_fields'  => $merge_fields,
-			'interests'     => $interests,
-		) );
+		);
+
+		if ( ! empty( $interests ) ) {
+			$args['interests'] = $interests;
+		}
+
+		$payload = apply_filters( 'edd_mc_subscribe_vars', $args );
+		$subscriber_hash = $this->api->subscriberHash( $user_info['email'] );
 
 		$this->api->put( $this->_resource . "/members/$subscriber_hash", $payload );
+
 		return $this->api->success();
 	}
 
