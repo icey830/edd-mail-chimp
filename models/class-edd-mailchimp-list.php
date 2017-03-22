@@ -158,7 +158,7 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 			foreach ( $category['interests'] as $interest ) {
 
 				$record = array(
-					'list_id' => $this->_record->id,
+					'list_id' => $this->id,
 					'interest_category_remote_id' => $category['id'],
 					'interest_category_name' => $category['name'],
 					'interest_remote_id' => $interest['id'],
