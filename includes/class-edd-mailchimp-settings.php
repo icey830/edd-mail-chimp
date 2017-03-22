@@ -224,25 +224,28 @@ class EDD_MailChimp_Settings {
 			<?php
 			$result = EDD_MailChimp_List::all();
 
-			foreach ( $result['lists'] as $list ) :
+			if ( isset( $result['lists'] ) && ! empty( $result['lists'] ) ) :
 
-				if ( in_array( $list['id'], $connected_list_ids ) ) {
-					continue;
-				}
 
-				?>
+				foreach ( $result['lists'] as $list ) :
 
-				<tr>
-					<td>
-						<input type="checkbox" name="edd_settings[eddmc_connect_lists][]" value="<?php esc_attr_e($list['id']); ?>" />
-					</td>
-					<td>
-						<span class="is-mailchimp-list-name"><?php echo $list['name']; ?></span>
-						<span class="is-mailchimp-list-id">ID: <?php echo $list['id']; ?></span>
-					</td>
-				</tr>
+					if ( in_array( $list['id'], $connected_list_ids ) ) {
+						continue;
+					}
 
-			<?php endforeach; ?>
+					?>
+
+					<tr>
+						<td>
+							<input type="checkbox" name="edd_settings[eddmc_connect_lists][]" value="<?php esc_attr_e($list['id']); ?>" />
+						</td>
+						<td>
+							<span class="is-mailchimp-list-name"><?php echo $list['name']; ?></span>
+							<span class="is-mailchimp-list-id">ID: <?php echo $list['id']; ?></span>
+						</td>
+					</tr>
+
+			<?php endforeach; endif; ?>
 				</tbody>
 			</table>
 		</div>
