@@ -12,7 +12,7 @@ class EDD_MailChimp_Ecommerce {
 	public function __construct() {
 		add_action( 'init', array( $this, 'set_ecommerce_session' ) );
 		add_action( 'edd_insert_payment', array( $this, 'set_ecommerce_flags' ), 10, 2 );
-		add_action( 'edd_complete_purchase', array( $this, 'add_order' ) );
+		add_action( 'edd_complete_purchase', array( $this, 'add_order' ), 20, 1 );
 		add_action( 'edd_update_payment_status', array( $this, 'remove_order' ), 10, 3 );
 	}
 
