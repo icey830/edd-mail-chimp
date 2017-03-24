@@ -27,7 +27,7 @@ class EDD_MailChimp_Model extends EDD_MailChimp_API {
 	 */
 	public static function find( $id = '' ) {
 		$klass = new static;
-		return $klass->api->get( $this->_resource );
+		return $klass->api->get( $klass->_endpoint . '/' . $id );
 	}
 
 
