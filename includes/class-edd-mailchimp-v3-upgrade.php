@@ -93,12 +93,20 @@ class EDD_MailChimp_V3_Upgrade {
 
 		if ( $list_id ) {
 			$list = new EDD_MailChimp_List( $list_id );
-			$mark_as_default = true;
-			$list->connect( $mark_as_default );
 
-			// Find or Create a MailChimp Store for this list and fire up a full sync job
-			$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
-			$store->sync();
+			if ( ! $list->is_connected() && $list->exists() ) {
+				$response = $list->api->getLastResponse();
+				$record = json_decode( $response['body'], true );
+
+				$list->name = $record['name'];
+
+				$mark_as_default = true;
+				$list->connect( $mark_as_default );
+
+				// Find or Create a MailChimp Store for this list and fire up a full sync job
+				$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+				$store->sync();
+			}
 
 			edd_delete_option( 'eddmc_list' );
 		}
@@ -168,7 +176,11 @@ class EDD_MailChimp_V3_Upgrade {
 						// Connect the list locally and begin sync if not exists.
 						$list = new EDD_MailChimp_List( $list_id );
 
-						if ( ! $list->is_connected() ) {
+						if ( ! $list->is_connected() && $list->exists ) {
+							$response = $list->api->getLastResponse();
+							$record = json_decode( $response['body'], true );
+
+							$list->name = $record['name'];
 							$list->connect();
 
 							// Also find/create the MailChimp Store
@@ -193,8 +205,13 @@ class EDD_MailChimp_V3_Upgrade {
 						// Connect the list locally and begin sync if not exists.
 						$list = new EDD_MailChimp_List( $list );
 
-						if ( ! $list->is_connected() ) {
+						if ( ! $list->is_connected() && $list->exists() ) {
+							$response = $list->api->getLastResponse();
+							$record = json_decode( $response['body'], true );
+
+							$list->name = $record['name'];
 							$list->connect();
+
 							$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 							$store->sync();
 						}
