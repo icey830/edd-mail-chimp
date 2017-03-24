@@ -78,6 +78,20 @@ class EDD_MailChimp_Download extends EDD_Download {
 
 		global $wpdb;
 
+		$result = $wpdb->get_row( $wpdb->prepare(
+				"SELECT *
+				FROM $wpdb->edd_mailchimp_downloads_lists
+				WHERE download_id = %d
+				AND list_id = %d",
+				$this->ID,
+				$list_id
+			)
+		);
+
+		if ( $result !== null ) {
+			return $result->id;
+		}
+
 		$result = $wpdb->insert( $wpdb->edd_mailchimp_downloads_lists, array(
 			'download_id' => $this->ID,
 			'list_id'     => $list_id,
@@ -102,6 +116,20 @@ class EDD_MailChimp_Download extends EDD_Download {
 	public function add_preferred_interest( $interest_id ) {
 
 		global $wpdb;
+
+		$result = $wpdb->get_row( $wpdb->prepare(
+				"SELECT *
+				FROM $wpdb->edd_mailchimp_downloads_interests
+				WHERE download_id = %d
+				AND interest_id = %d",
+				$this->ID,
+				$interest_id
+			)
+		);
+
+		if ( $result !== null ) {
+			return $result->id;
+		}
 
 		$result = $wpdb->insert( $wpdb->edd_mailchimp_downloads_interests, array(
 			'download_id' => $this->ID,
