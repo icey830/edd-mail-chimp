@@ -228,7 +228,7 @@ class EDD_MailChimp_V3_Upgrade {
 			$this->step++;
 			$redirect = add_query_arg( array(
 				'page'        => 'edd-upgrades',
-				'edd-upgrade' => 'upgrade_mailchimp_api3',
+				'edd-upgrade' => 'upgrade_mailchimp_api3_groupings',
 				'step'        => $this->step,
 				'total'       => $this->total_products
 			), admin_url( 'index.php' ) );
@@ -237,7 +237,6 @@ class EDD_MailChimp_V3_Upgrade {
 		} else {
 
 			// No more products found, finish up
-
 			delete_transient( 'edd_mailchimp_list_data' );
 			self::mark_as_complete();
 			self::redirect( admin_url() );
