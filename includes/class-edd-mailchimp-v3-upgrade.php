@@ -129,8 +129,6 @@ class EDD_MailChimp_V3_Upgrade {
 
 		global $wpdb;
 
-		$api = new MailChimp( $this->key );
-
 		$this->set_step();
 		$this->products();
 		$this->total_products();
