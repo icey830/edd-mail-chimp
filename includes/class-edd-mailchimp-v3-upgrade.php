@@ -75,7 +75,7 @@ class EDD_MailChimp_V3_Upgrade {
 		}
 
 		$next_upgrade_url = admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_mailchimp_api3_groupings' );
-		self::redirect( $redirect );
+		self::redirect( $next_upgrade_url );
 	}
 
 	/**
