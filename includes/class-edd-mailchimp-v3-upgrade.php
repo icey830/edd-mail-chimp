@@ -195,7 +195,7 @@ class EDD_MailChimp_V3_Upgrade {
 						// If they are the same, migrate that over to the new post meta.
 						foreach ( $interests as $interest ) {
 							if ( strtolower( $interest->interest_name ) === strtolower( $interest_name ) ) {
-								$download->add_preferred_interest( $interest->id );
+								$download->add_preferred_interest( (int) $interest->id );
 							}
 						}
 
@@ -220,7 +220,7 @@ class EDD_MailChimp_V3_Upgrade {
 					delete_transient( 'edd_mailchimp_groupings_' . $list->remote_id);
 
 					// Assign this list as a download-specific preference.
-					$download->add_preferred_list( $list->id );
+					$download->add_preferred_list( (int) $list->id );
 				}
 
 			}
