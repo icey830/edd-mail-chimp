@@ -136,15 +136,16 @@ class EDD_MailChimp_V3_Upgrade {
 		if ( ! empty( $this->products->posts ) ) {
 			foreach( $this->products->posts as $product ) {
 
-				$settings = (array) get_post_meta( $product->ID, '_edd_mailchimp', true );
+				$settings = get_post_meta( $product->ID, '_edd_mailchimp', true );
 
-				if ( empty( $settings) ) {
+				if ( empty( $settings ) ) {
 					continue;
 				}
 
 				$download = new EDD_MailChimp_Download( (int) $product->ID );
 
-				foreach ( $settings as $index => $list ) {
+				foreach ( (array) $settings as $index => $list ) {
+
 					if ( strpos( $list, '|' ) != false ) {
 
 						// This is an old style setting for MailChimp API v2,
