@@ -110,6 +110,18 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 
 		$interests = array();
 
+		$replace_interests = edd_get_option('eddmc_replace_interests');
+
+		if ( $replace_interests ) {
+			$records = $this->interests();
+
+			if ( ! empty( $records ) ) {
+				foreach( $records as $row ) {
+					$interests[$row->interest_remote_id] = false;
+				}
+			}
+		}
+
 		if ( isset( $options['interests'] ) ) {
 			foreach( $options['interests'] as $interest ) {
 				$interests[$interest['remote_id']] = true;

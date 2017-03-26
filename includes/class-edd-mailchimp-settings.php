@@ -62,6 +62,12 @@ class EDD_MailChimp_Settings {
 				'name'    => __( 'Double Opt-In', 'eddmc' ),
 				'desc'    => __( 'When checked, users will be sent a confirmation email after signing up, and will only be added once they have confirmed the subscription.', 'eddmc' ),
 				'type'    => 'checkbox'
+			),
+			array(
+				'id'      => 'eddmc_replace_interests',
+				'name'    => __( 'Replace Interests', 'eddmc' ),
+				'desc'    => __( 'When checked, a MailChimp subscriber\'s interests will be replaced during new purchases rather than merged.', 'eddmc' ),
+				'type'    => 'checkbox'
 			)
 		);
 
