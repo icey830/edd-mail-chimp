@@ -132,7 +132,7 @@ class EDD_MailChimp_Settings {
 
 					// Determine if list should be set as default
 					// based on if another default list already exists.
-					$check = EDD_MailChimp_List::default();
+					$check = EDD_MailChimp_List::get_default();
 					$is_default = $check !== null ? false : true;
 
 					// Insert as new connected list
