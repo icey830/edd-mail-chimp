@@ -93,7 +93,7 @@ class EDD_MailChimp_Actions {
 			'email'      => $payment->email,
 		);
 
-		$default_list = EDD_MailChimp_List::default();
+		$default_list = EDD_MailChimp_List::get_default();
 
 		if ( $default_list ) {
 			$result = $default_list->subscribe( $user );

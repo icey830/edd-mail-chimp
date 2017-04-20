@@ -43,7 +43,7 @@ class EDD_MailChimp_Checkout {
 	*/
 	public function checkout_signup( $posted, $user_info, $valid_data ) {
 		if ( isset( $posted['edd_mailchimp_signup'] ) ) {
-			$default_list = EDD_MailChimp_List::default();
+			$default_list = EDD_MailChimp_List::get_default();
 
 			if ( $default_list ) {
 				$default_list->subscribe( $user_info );

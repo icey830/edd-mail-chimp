@@ -19,11 +19,11 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 	/**
 	 * Fetch the connected list that is specified as default
 	 *
-	 *   $default_list = EDD_MailChimp_List::default();
+	 *   $default_list = EDD_MailChimp_List::get_default();
 	 *
 	 * @return mixed  EDD_MailChimp_List | null
 	 */
-	public static function default() {
+	public static function get_default() {
 		global $wpdb;
 
 		$result = $wpdb->get_row(

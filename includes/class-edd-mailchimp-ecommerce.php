@@ -74,7 +74,7 @@ class EDD_MailChimp_Ecommerce {
 
 		// Send/update order in MailChimp
 		try {
-			$default_list = EDD_MailChimp_List::default();
+			$default_list = EDD_MailChimp_List::get_default();
 
 			if ( $default_list ) {
 				$store = EDD_MailChimp_Store::find_or_create($default_list);
@@ -120,7 +120,7 @@ class EDD_MailChimp_Ecommerce {
 		$order = new EDD_MailChimp_Order( $payment_id );
 
 		try {
-			$default_list = EDD_MailChimp_List::default();
+			$default_list = EDD_MailChimp_List::get_default();
 
 			if ( $default_list ) {
 				$store = EDD_MailChimp_Store::find_or_create( $default_list );

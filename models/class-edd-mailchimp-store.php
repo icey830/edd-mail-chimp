@@ -55,7 +55,7 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
 	 */
 	protected function _set_list( $list = false  ) {
 		if ( $list === false ) {
-			$list = EDD_MailChimp_List::default();
+			$list = EDD_MailChimp_List::get_default();
 			$this->list_id = $list->remote_id;
 		} elseif ( is_string( $list ) ) {
 			$this->list_id = $list;
