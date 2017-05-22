@@ -76,10 +76,10 @@ class EDD_MailChimp_Metabox {
 	 */
 	public function save_metabox( $post_id, $post ) {
 		$download = new EDD_MailChimp_Download( $post_id );
+		$download->clear_subscription_preferences();
 
 		if ( isset( $_POST['edd_mailchimp_lists'] ) && ! empty( $_POST['edd_mailchimp_lists'] ) ) {
-			$download->clear_subscription_preferences();
-
+			
 			foreach ( $_POST['edd_mailchimp_lists'] as $list_id ) {
 				$list_id = absint( $list_id );
 				$download->add_preferred_list( $list_id );
