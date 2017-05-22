@@ -12,6 +12,7 @@ class EDD_MailChimp_Settings {
 
 		add_action( 'edd_settings_tab_bottom_extensions_mailchimp', array( $this, 'connected_lists' ) );
 		add_action( 'admin_notices', array($this, 'display_sync_notice') );
+		add_action( 'admin_notices', array($this, 'display_disconnected_notice') );
 	}
 
 	/**
@@ -169,6 +170,25 @@ class EDD_MailChimp_Settings {
 	}
 
 	/**
+	 * Show a notice to the user when a list has been disconnected.
+	 *
+	 * @return string | void
+	 */
+	public function display_disconnected_notice() {
+		if ( ! isset( $_GET['edd_mailchimp_list_disconnected'] ) ) {
+			return;
+		}
+
+		ob_start();
+		?>
+		    <div class="notice notice-success">
+		        <p><?php _e( 'Your MailChimp list has been disconnected from your Easy Digital Downloads store.', 'eddmc' ); ?></p>
+		    </div>
+		<?php
+		echo ob_get_clean();
+	}
+
+	/**
 	 * Add our custom connected lists setting below.
 	 *
 	 * @return void
@@ -189,6 +209,19 @@ class EDD_MailChimp_Settings {
 		<?php if ( empty( $lists ) ) : ?>
 			<p><?php _e('There are currently no MailChimp lists connected to Easy Digital Downloads.', 'eddmc'); ?></p>
 		<?php else: ?>
+
+			<script>
+				(function($){
+					$(document).ready(function(){
+						$('.edd-mailchimp-disconnect-list').click(function() {
+							if ( ! confirm("<?php _e('Are you sure you want to disconnect this list?', 'eddmc');?>" ) ) {
+								return false;
+							}
+						});
+					});
+				})(jQuery);
+			</script>
+
 			<p><?php _e('These are the MailChimp lists that are currently connected to Easy Digital Downloads.', 'eddmc'); ?></p>
 			<table class="is-edd-mailchimp-table is-edd-mailchimp-connected-lists-table form-table wp-list-table widefat fixed posts">
 				<thead>
@@ -210,6 +243,16 @@ class EDD_MailChimp_Settings {
 
 					// Remove the section from the tabs so we always end up at the main section
 					$force_list_sync_url = remove_query_arg( 'section', $force_list_sync_url );
+
+					$disconnect_list_url = add_query_arg( array(
+						'settings-updated' => false,
+						'tab'              => 'extensions',
+						'edd-action' => 'mailchimp_disconnect_list',
+						'mailchimp_list_remote_id' => $list->remote_id,
+					) );
+
+					// Remove the section from the tabs so we always end up at the main section
+					$disconnect_list_url = remove_query_arg( 'section', $disconnect_list_url );
 				?>
 				<?php $connected_list_ids[] = $list->remote_id; ?>
 				<tr>
@@ -238,7 +281,8 @@ class EDD_MailChimp_Settings {
 					</td>
 
 					<td>
-						<a href="<?php echo esc_url($force_list_sync_url); ?>"><?php _e('Force Sync Now', 'eddmc'); ?></a>
+						<a href="<?php echo esc_url($force_list_sync_url); ?>"><?php _e('Force Sync Now', 'eddmc'); ?></a> |
+						<a class="edd-mailchimp-disconnect-list" style="color: red;" href="<?php echo esc_url($disconnect_list_url); ?>"><?php _e('Disconnect', 'eddmc'); ?></a>
 					</td>
 				</tr>
 			<?php endforeach; ?>

@@ -12,6 +12,7 @@ class EDD_MailChimp_Actions {
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_scripts') );
 		add_action( 'edd_complete_download_purchase', array( $this, 'hook_signup' ), 10, 3 );
 		add_action( 'edd_mailchimp_force_list_sync', array( $this, 'force_list_sync') );
+		add_action( 'edd_mailchimp_disconnect_list', array( $this, 'disconnect_list') );
 	}
 
 	/**
@@ -55,6 +56,41 @@ class EDD_MailChimp_Actions {
 
 				wp_safe_redirect( $redirect_url );
 				exit;
+			}
+		}
+	}
+
+	/**
+	 * Disconnect a list from this EDD install.
+	 *
+	 * @param  [type] $request [description]
+	 * @return [type]          [description]
+	 */
+	public function disconnect_list( $request ) {
+		$list_id = sanitize_key( $request['mailchimp_list_remote_id'] );
+
+		if ( $list_id ) {
+			try {
+				$list = new EDD_MailChimp_List( $list_id );
+
+				if ( $list->is_connected() ) {
+
+					$list->disconnect();
+
+					$redirect_url = add_query_arg( array(
+						'settings-updated' => false,
+						'tab'              => 'extensions',
+						'edd_mailchimp_list_disconnected' => 1,
+					) );
+
+					// Remove the section from the tabs so we always end up at the main section
+					$redirect_url = remove_query_arg( array('section', 'edd-action', 'mailchimp_list_remote_id'), $redirect_url );
+
+					wp_safe_redirect( $redirect_url );
+					exit;
+				}
+			} catch (Exception $e) {
+				return;
 			}
 		}
 	}

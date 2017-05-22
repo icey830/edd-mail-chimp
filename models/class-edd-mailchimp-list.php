@@ -87,6 +87,35 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 		return $this;
 	}
 
+	/**
+	 * Disconnect a list from the local EDD install.
+	 *
+	 * @return bool
+	 */
+	public function disconnect() {
+		global $wpdb;
+
+		$wpdb->delete(
+			$wpdb->edd_mailchimp_lists,
+			array( 'id' => $this->id ),
+			array( '%d' )
+		);
+
+		$wpdb->delete(
+			$wpdb->edd_mailchimp_interests,
+			array( 'list_id' => $this->id ),
+			array( '%d' )
+		);
+
+		$wpdb->delete(
+			$wpdb->edd_mailchimp_downloads_lists,
+			array( 'list_id' => $this->id ),
+			array( '%d' )
+		);
+
+		return true;
+	}
+
 
 	/**
 	 * Subscribe an email to a list.
