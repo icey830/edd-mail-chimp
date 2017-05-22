@@ -11,6 +11,7 @@ class EDD_MailChimp_Settings {
 		add_filter( 'edd_settings_extensions_sanitize', array( $this, 'save_settings' ) );
 
 		add_action( 'edd_settings_tab_bottom_extensions_mailchimp', array( $this, 'connected_lists' ) );
+		add_action( 'admin_notices', array($this, 'display_sync_notice') );
 	}
 
 	/**
@@ -149,6 +150,25 @@ class EDD_MailChimp_Settings {
 	}
 
 	/**
+	 * Show a notice to the user when a list has been queued for sync.
+	 *
+	 * @return string | void
+	 */
+	public function display_sync_notice() {
+		if ( ! isset( $_GET['edd_mailchimp_list_queued'] ) ) {
+			return;
+		}
+
+		ob_start();
+		?>
+		    <div class="notice notice-success">
+		        <p><?php _e( 'Your MailChimp list has been queued for syncing.', 'eddmc' ); ?></p>
+		    </div>
+		<?php
+		echo ob_get_clean();
+	}
+
+	/**
 	 * Add our custom connected lists setting below.
 	 *
 	 * @return void
@@ -180,6 +200,17 @@ class EDD_MailChimp_Settings {
 					</tr>
 				</thead>
 			<?php foreach ($lists as $list): ?>
+				<?php
+					$force_list_sync_url = add_query_arg( array(
+						'settings-updated' => false,
+						'tab'              => 'extensions',
+						'edd-action' => 'mailchimp_force_list_sync',
+						'mailchimp_list_remote_id' => $list->remote_id,
+					) );
+
+					// Remove the section from the tabs so we always end up at the main section
+					$force_list_sync_url = remove_query_arg( 'section', $force_list_sync_url );
+				?>
 				<?php $connected_list_ids[] = $list->remote_id; ?>
 				<tr>
 					<td>
@@ -207,7 +238,7 @@ class EDD_MailChimp_Settings {
 					</td>
 
 					<td>
-						<a href="#"><?php _e('Force Sync Now', 'eddmc'); ?></a>
+						<a href="<?php echo esc_url($force_list_sync_url); ?>"><?php _e('Force Sync Now', 'eddmc'); ?></a>
 					</td>
 				</tr>
 			<?php endforeach; ?>

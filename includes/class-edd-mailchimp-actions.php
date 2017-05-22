@@ -11,7 +11,54 @@ class EDD_MailChimp_Actions {
 		// add_action( 'edd_cart_contents_loaded_from_session', array( $this, 'set_cart' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_scripts') );
 		add_action( 'edd_complete_download_purchase', array( $this, 'hook_signup' ), 10, 3 );
+		add_action( 'edd_mailchimp_force_list_sync', array( $this, 'force_list_sync') );
 	}
+
+	/**
+	 * Fire up a full list sync when requested by the user from the settings page.
+	 *
+	 * @param  $_GET $request Request parameters
+	 * @return void
+	 */
+	public function force_list_sync( $request ) {
+		$list_id = sanitize_key( $request['mailchimp_list_remote_id'] );
+
+		if ( $list_id ) {
+			$list = new EDD_MailChimp_List( $list_id );
+
+			if ( $list->is_connected() && $list->exists() ) {
+				$response = $list->api->getLastResponse();
+				$record = json_decode( $response['body'], true );
+
+				// Find or Create a MailChimp Store for this list and fire up a full sync job
+				$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+				$store->sync();
+
+				global $wpdb;
+
+				$wpdb->update(
+					$wpdb->edd_mailchimp_lists,
+					array( 'sync_status' => 'pending' ),
+					array( 'remote_id' => $list_id ),
+					array( '%s'),
+					array( '%s' )
+				);
+
+				$redirect_url = add_query_arg( array(
+					'settings-updated' => false,
+					'tab'              => 'extensions',
+					'edd_mailchimp_list_queued' => 1,
+				) );
+
+				// Remove the section from the tabs so we always end up at the main section
+				$redirect_url = remove_query_arg( array('section', 'edd-action', 'mailchimp_list_remote_id'), $redirect_url );
+
+				wp_safe_redirect( $redirect_url );
+				exit;
+			}
+		}
+	}
+
 
 	/**
 	 * Create product in MailChimp Store for each connected list.
