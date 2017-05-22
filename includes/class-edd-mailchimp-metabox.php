@@ -66,8 +66,6 @@ class EDD_MailChimp_Metabox {
 			</script>
 		<?php
 
-		echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing.', 'eddmc' ) . '</p>';
-
 		$connected_lists = EDD_MailChimp_List::connected();
 		$download = new EDD_MailChimp_Download( (int) $post->ID );
 		$preferences = $download->subscription_preferences();
@@ -85,26 +83,42 @@ class EDD_MailChimp_Metabox {
 			}
 		}
 
-		foreach( $connected_lists as $list ) {
-			$list = new EDD_MailChimp_List( $list->remote_id );
+		if ( ! empty( $connected_lists ) ) {
+			echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing.', 'eddmc' ) . '</p>';
 
-			echo '<label>';
-				echo '<input class="edd-mailchimp-list" type="checkbox" name="edd_mailchimp_lists[]" value="' . esc_attr( $list->id ) . '"' . checked( true, in_array( $list->id, $preferred_list_ids ), false ) . '>';
-				echo '&nbsp;' . $list->name;
-			echo '</label><br/>';
+			foreach( $connected_lists as $list ) {
+				$list = new EDD_MailChimp_List( $list->remote_id );
 
-			$interests = $list->interests();
+				echo '<label>';
+					echo '<input class="edd-mailchimp-list" type="checkbox" name="edd_mailchimp_lists[]" value="' . esc_attr( $list->id ) . '"' . checked( true, in_array( $list->id, $preferred_list_ids ), false ) . '>';
+					echo '&nbsp;' . $list->name;
+				echo '</label><br/>';
 
-			if ( ! empty( $interests ) ) {
-				foreach ( $interests as $interest ){
-					echo '<label data-mailchimp-list="'. esc_attr($list->id) .'">';
-						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="edd_mailchimp_interests[]" value="' . esc_attr( $interest->id ) . '"' . checked( true, in_array( $interest->id, $preferred_interest_ids ), false ) . '>';
-						echo '&nbsp;' . $interest->interest_name;
-						echo '<br/>';
-					echo '</label>';
+				$interests = $list->interests();
+
+				if ( ! empty( $interests ) ) {
+					foreach ( $interests as $interest ){
+						echo '<label data-mailchimp-list="'. esc_attr($list->id) .'">';
+							echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="edd_mailchimp_interests[]" value="' . esc_attr( $interest->id ) . '"' . checked( true, in_array( $interest->id, $preferred_interest_ids ), false ) . '>';
+							echo '&nbsp;' . $interest->interest_name;
+							echo '<br/>';
+						echo '</label>';
+					}
 				}
 			}
+		} else {
+			echo '<p>' . __( 'Please visit the EDD MailChimp settings page to connect your MailChimp lists to your EDD site.', 'eddmc' ) . '</p>';
 		}
+
+		echo '<hr style="margin: 20px 0;" />';
+
+		$double_opt_in = get_post_meta( $post->ID, 'edd_mailchimp_double_opt_in', true );
+
+		echo '<p>' . __('Check this box if purchasers of this product should be required to confirm their subscription to your MailChimp list.', 'eddmc') . '</p>';
+		echo '<label>';
+		echo '<input type="checkbox" name="edd_mailchimp_double_opt_in" value="1"' . checked( true, !empty($double_opt_in), false ) . '>&nbsp;';
+		_e('Require Double Opt-In', 'eddmc');
+		echo '</label>';
 	}
 
 	/**
@@ -131,6 +145,12 @@ class EDD_MailChimp_Metabox {
 					$download->add_preferred_interest( $interest_id );
 				}
 			}
+		}
+
+		delete_post_meta($post_id, 'edd_mailchimp_double_opt_in');
+
+		if ( isset( $_POST['edd_mailchimp_double_opt_in'] ) && $_POST['edd_mailchimp_double_opt_in'] == 1 ) {
+			add_post_meta( $post_id, 'edd_mailchimp_double_opt_in', true );
 		}
 	}
 
