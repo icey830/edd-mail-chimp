@@ -245,6 +245,14 @@ class EDD_MailChimp_Settings {
 			</table>
 		<?php endif; ?>
 
+		<?php
+			try {
+				$result = EDD_MailChimp_List::all();
+			} catch (Exception $e) {
+				_e('Please supply a valid MailChimp API key.', 'eddmc');
+				return;
+			}
+		?>
 
 		<h2><?php _e('Available Lists', 'eddmc'); ?></h2>
 		<p><?php _e('Select the checkbox next to the MailChimp lists that you would like to connect to Easy Digital Downloads.', 'eddmc'); ?></p>
@@ -259,10 +267,9 @@ class EDD_MailChimp_Settings {
 				</thead>
 				<tbody>
 			<?php
-			$result = EDD_MailChimp_List::all();
+			
 
 			if ( isset( $result['lists'] ) && ! empty( $result['lists'] ) ) :
-
 
 				foreach ( $result['lists'] as $list ) :
 
