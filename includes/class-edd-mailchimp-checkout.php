@@ -19,6 +19,7 @@ class EDD_MailChimp_Checkout {
 		}
 
 		$label = edd_get_option('eddmc_label');
+		$checked = edd_get_option('eddmc_checkout_signup_default_value', false);
 
 		if( ! empty( $label ) ) {
 			$checkout_label = trim( $label );
@@ -29,7 +30,7 @@ class EDD_MailChimp_Checkout {
 		ob_start(); ?>
 		<fieldset id="edd_mailchimp">
 			<p>
-				<input name="edd_mailchimp_signup" id="edd_mailchimp_signup" type="checkbox" checked="checked"/>
+				<input name="edd_mailchimp_signup" id="edd_mailchimp_signup" type="checkbox" <?php if ($checked) { echo 'checked="checked"' } ?>/>
 				<label for="edd_mailchimp_signup"><?php echo $checkout_label; ?></label>
 			</p>
 		</fieldset>

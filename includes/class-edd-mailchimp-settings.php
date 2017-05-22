@@ -49,7 +49,13 @@ class EDD_MailChimp_Settings {
 			array(
 				'id'      => 'eddmc_show_checkout_signup',
 				'name'    => __( 'Show Signup on Checkout', 'eddmc' ),
-				'desc'    => __( 'Allow customers to signup for the list selected below during checkout?', 'eddmc' ),
+				'desc'    => __( 'Allow customers to signup for the default list selected below during checkout?', 'eddmc' ),
+				'type'    => 'checkbox'
+			),
+			array(
+				'id'      => 'eddmc_checkout_signup_default_value',
+				'name'    => __( 'Signup Checked by Default', 'eddmc' ),
+				'desc'    => __( 'Should the newsletter signup checkbox shown during checkout be checked by default?', 'eddmc' ),
 				'type'    => 'checkbox'
 			),
 			array(
