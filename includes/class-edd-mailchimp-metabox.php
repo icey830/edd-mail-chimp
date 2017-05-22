@@ -27,6 +27,45 @@ class EDD_MailChimp_Metabox {
 
 		global $post;
 
+		?>
+			<script>
+				(function($){
+					$(document).ready(function() {
+						
+						var unchecked = $('.edd-mailchimp-list:not(:checked)');
+
+						unchecked.map(function(i) {
+							var list_id = this.value;
+							var $interests = $('[data-mailchimp-list="' + list_id + '"]');
+
+							if ( $interests.length > 0 ) {
+								$interests.map( function(index) {
+									$(this).find('input').prop('checked', false);
+								});
+								$interests.fadeOut();
+							}
+						});
+						
+						$('.edd-mailchimp-list').change(function() {
+							var list_id = this.value;
+							var $interests = $('[data-mailchimp-list="' + list_id + '"]');
+
+							if ( $interests.length > 0 ) {
+								if(this.checked) {
+									$interests.fadeIn();
+								} else {
+									$interests.map( function(index) {
+										$(this).find('input').prop('checked', false);
+									});
+									$interests.fadeOut();
+								}
+							}
+						});
+					});
+				})(jQuery)
+			</script>
+		<?php
+
 		echo '<p>' . __( 'Select the lists you wish buyers to be subscribed to when purchasing.', 'eddmc' ) . '</p>';
 
 		$connected_lists = EDD_MailChimp_List::connected();
@@ -50,7 +89,7 @@ class EDD_MailChimp_Metabox {
 			$list = new EDD_MailChimp_List( $list->remote_id );
 
 			echo '<label>';
-				echo '<input type="checkbox" name="edd_mailchimp_lists' . '[]" value="' . esc_attr( $list->id ) . '"' . checked( true, in_array( $list->id, $preferred_list_ids ), false ) . '>';
+				echo '<input class="edd-mailchimp-list" type="checkbox" name="edd_mailchimp_lists[]" value="' . esc_attr( $list->id ) . '"' . checked( true, in_array( $list->id, $preferred_list_ids ), false ) . '>';
 				echo '&nbsp;' . $list->name;
 			echo '</label><br/>';
 
@@ -58,10 +97,11 @@ class EDD_MailChimp_Metabox {
 
 			if ( ! empty( $interests ) ) {
 				foreach ( $interests as $interest ){
-					echo '<label>';
+					echo '<label data-mailchimp-list="'. esc_attr($list->id) .'">';
 						echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="edd_mailchimp_interests[]" value="' . esc_attr( $interest->id ) . '"' . checked( true, in_array( $interest->id, $preferred_interest_ids ), false ) . '>';
 						echo '&nbsp;' . $interest->interest_name;
-					echo '</label><br/>';
+						echo '<br/>';
+					echo '</label>';
 				}
 			}
 		}
@@ -79,7 +119,7 @@ class EDD_MailChimp_Metabox {
 		$download->clear_subscription_preferences();
 
 		if ( isset( $_POST['edd_mailchimp_lists'] ) && ! empty( $_POST['edd_mailchimp_lists'] ) ) {
-			
+
 			foreach ( $_POST['edd_mailchimp_lists'] as $list_id ) {
 				$list_id = absint( $list_id );
 				$download->add_preferred_list( $list_id );
