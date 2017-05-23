@@ -1,5 +1,7 @@
 <?php
 
+use \DrewM\MailChimp\MailChimp;
+
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) exit;
 
@@ -94,6 +96,17 @@ class EDD_MailChimp_Settings {
 	 * @return array $input modified input, if any
 	 */
 	public function save_settings( $input ) {
+
+		if ( isset( $input['eddmc_api'] ) ) {
+			$input['eddmc_api'] = trim( sanitize_key( $input['eddmc_api'] ) );
+
+			try {
+				$api = new MailChimp( $input['eddmc_api'] );
+				$ping = $api->get('/');
+			} catch( Exception $e ) {
+				unset( $input['eddmc_api'] );
+			}
+		}
 
 		global $wpdb;
 
