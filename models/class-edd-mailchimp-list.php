@@ -130,6 +130,11 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 		}
 
 		$opt_in = edd_get_option('eddmc_double_opt_in');
+
+		if ( ! $opt_in ) {
+			$opt_in = isset( $options['double_opt_in'] ) && $options['double_opt_in'] === true;
+		}
+
 		$status = $opt_in ? 'pending' : 'subscribed';
 
 		$merge_fields = array(

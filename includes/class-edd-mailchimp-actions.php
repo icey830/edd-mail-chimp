@@ -187,9 +187,13 @@ class EDD_MailChimp_Actions {
 			$download = new EDD_MailChimp_Download( (int) $line['id'] );
 			$preferences = $download->subscription_preferences();
 
+			$double_opt_in = get_post_meta( $post->ID, 'edd_mailchimp_double_opt_in', true );
+
 			foreach( $preferences as $preference ) {
 				$list = new EDD_MailChimp_List( $preference['remote_id'] );
 				$options = array( 'interests' => $preference['interests'] );
+				$is_double_opt_in = empty( $double_opt_in );
+				$options['double_opt_in'] = $is_double_opt_in;
 				$list->subscribe( $user, $options );
 			}
 		}
