@@ -25,8 +25,10 @@ class EDD_MailChimp_Ecommerce {
 	 */
 	public function set_ecommerce_flags( $payment_id = 0, $payment_data = array() ) {
 
-		// Don't record details if we're in test mode
-		if ( edd_is_test_mode() ) {
+		$record_test_mode = edd_get_option('eddmc_record_test_mode');
+
+		// Don't record details if we're in test mode and user prefers not to record.
+		if ( edd_is_test_mode() && $record_test_mode === false ) {
 			return;
 		}
 
@@ -55,8 +57,10 @@ class EDD_MailChimp_Ecommerce {
 	 */
 	public function add_order( $payment_id = 0 ) {
 
-		// Don't record details if we're in test mode
-		if ( edd_is_test_mode() ) {
+		$record_test_mode = edd_get_option('eddmc_record_test_mode');
+
+		// Don't record details if we're in test mode and user prefers not to record.
+		if ( edd_is_test_mode() && $record_test_mode === false ) {
 			return;
 		}
 

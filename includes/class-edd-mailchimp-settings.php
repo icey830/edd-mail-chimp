@@ -78,6 +78,12 @@ class EDD_MailChimp_Settings {
 				'name'    => __( 'Replace Interests', 'eddmc' ),
 				'desc'    => __( 'When checked, a MailChimp subscriber\'s interests will be replaced during new purchases rather than merged.', 'eddmc' ),
 				'type'    => 'checkbox'
+			),
+			array(
+				'id'      => 'eddmc_record_test_mode',
+				'name'    => __( 'Record Ecommerce Data in Test Mode', 'eddmc' ),
+				'desc'    => __( 'When checked, all purchase data will still be recorded in MailChimp when your EDD store is in Test Mode.', 'eddmc' ),
+				'type'    => 'checkbox'
 			)
 		);
 
