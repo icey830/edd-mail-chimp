@@ -41,7 +41,7 @@ class EDD_MailChimp_Customer extends EDD_MailChimp_Model {
 		$customer = array(
 			'id' => $this->_customer->id,
 			'email_address' => $this->_customer->email,
-			'opt_in_status' => false,
+			'opt_in_status' => apply_filters('edd.mailchimp.customer.opt_in_status', false, $customer, $this->_payment),  // false => transactional, true => subscribed
 			'orders_count'  => (int) $this->_customer->purchase_count,
 			'total_spent'   => $this->_customer->purchase_value,
 			'first_name'    => $first_name,
