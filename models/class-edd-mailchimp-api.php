@@ -16,6 +16,10 @@ class EDD_MailChimp_API {
 
 		if ( $key ) {
 			$this->api = new MailChimp( trim( $key ) );
+
+			if ( defined('EDD_MC_VERIFY_SSL') && EDD_MC_VERIFY_SSL === false ) {
+				$this->api->verify_ssl = false;
+			}
 		}
 	}
 
