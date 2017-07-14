@@ -17,6 +17,23 @@ class EDD_MailChimp_Ecommerce {
 	}
 
 	/**
+	 * Enables MailChimp's Ecommerce tracking from the parameters
+	 * added to a newsletter campaign
+	 *
+	 * @uses campaign UID
+	 * @uses member email's UID
+	 */
+	public function set_ecommerce_session() {
+		$mc_cid = isset( $_GET['mc_cid'] ) ? $_GET['mc_cid'] : '';
+		$mc_eid = isset( $_GET['mc_eid'] ) ? $_GET['mc_eid'] : '';
+
+		if ( ! empty( $mc_cid ) && ! empty( $mc_eid ) ) {
+			EDD()->session->set( self::_get_session_id( 'campaign' ), filter_var( $mc_cid , FILTER_SANITIZE_STRING ) );
+			EDD()->session->set( self::_get_session_id( 'email' ),    filter_var( $mc_eid , FILTER_SANITIZE_STRING ) );
+		}
+	}
+
+	/**
 	 * Sets flags in post meta so that we can detect them when completing a purchase via IPN
 	 *
 	 * @param  integer $payment_id
@@ -149,23 +166,6 @@ class EDD_MailChimp_Ecommerce {
 		} catch (Exception $e) {
 			edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
 			return false;
-		}
-	}
-
-	/**
-	 * Enables MailChimp's Ecommerce tracking from the parameters
-	 * added to a newsletter campaign
-	 *
-	 * @uses campaign UID
-	 * @uses member email's UID
-	 */
-	public function set_ecommerce_session() {
-		$mc_cid = isset( $_GET['mc_cid'] ) ? $_GET['mc_cid'] : '';
-		$mc_eid = isset( $_GET['mc_eid'] ) ? $_GET['mc_eid'] : '';
-
-		if ( ! empty( $mc_cid ) && ! empty( $mc_eid ) ) {
-			EDD()->session->set( self::_get_session_id( 'campaign' ), filter_var( $mc_cid , FILTER_SANITIZE_STRING ) );
-			EDD()->session->set( self::_get_session_id( 'email' ),    filter_var( $mc_eid , FILTER_SANITIZE_STRING ) );
 		}
 	}
 
