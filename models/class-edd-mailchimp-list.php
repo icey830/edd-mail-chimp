@@ -302,6 +302,29 @@ class EDD_MailChimp_List extends EDD_MailChimp_Model {
 
 
 	/**
+	 * Determines if the current list was the recipient of a
+	 * specific campaign based on the MailChimp campaign id.
+	 *
+	 * @param  string $campaign_id A 10-character alphanumeric MailChimp Campaign ID
+	 * @return boolean was the current list the recipient of the provided campaign?
+	 */
+	public function recipient_of_campaign( $campaign_id = '' ) {
+		if ( $campaign_id === '' ) {
+			return false;
+		}
+
+		$endpoint = '/campaigns/' . $campaign_id;
+		$campaign = $this->api->get( $endpoint, array('fields' => 'recipients.list_id') );
+
+		if ( ! $this->api->success() ) {
+			return false;
+		}
+
+		return $this->remote_id == $campaign['recipients']['list_id'];
+	}
+
+
+	/**
 	 * Sets the class `_record` property if the list has been connected locally.
 	 *
 	 * @return EDD_MailChimp_List
