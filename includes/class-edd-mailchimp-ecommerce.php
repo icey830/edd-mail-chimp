@@ -85,13 +85,64 @@ class EDD_MailChimp_Ecommerce {
 
 		// Set Ecommerce360 variables if they exist
 		$campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
-		$email_id    = get_post_meta( $payment_id, '_edd_mc_email_id', true );
-
-		// @todo Fetch unique email address for customer using the ecommerce tracking email id?
 
 		if ( ! empty( $campaign_id ) ) {
 			$order['campaign_id'] = $campaign_id;
 		}
+		/**
+		 * In July 2017, the Easy Digital Downloads team decided that the email address
+		 * entered by the customer during checkout should be the authorative factor in
+		 * determining which email address the EDD order should be associated with.
+		 *
+		 * This email address _could_ be different than the one associated with the unique
+		 * email id that may have been stored if the user was referred to this purchase
+		 * by a MailChimp campaign.
+		 *
+		 * If you wish to rather associate the EDD Order with the email address that
+		 * was sent the referring campaign, you should hook a callback function to the
+		 * following WordPress filter provided by this plugin:
+		 *
+		 *   edd.mailchimp.order
+		 *
+		 * You can then fetch the unique MailChimp email ID from the referring campaign
+		 * by checking the post meta entry for the EDD Payment ID.
+		 *
+		 *   $email_id = get_post_meta( $payment_id, '_edd_mc_email_id', true );
+		 *
+		 * If it exists, you would then need to determine which list that the referring
+		 * campaign was sent from. You can do so with a request similar to this:
+		 *
+		 *   $campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
+		 *
+		 * Make sure to first check that the $campaign_id also exists, and then dispatch
+		 * an authenticated GET request with the MailChimp API library.
+		 *
+		 *   GET https://us5.api.mailchimp.com/3.0/campaigns/{$campaign_id}
+		 *
+		 * The corresponding MailChimp List ID will exist in the response from that request.
+		 *
+		 *   $list_id = $response->recipients->list_id;
+		 *
+		 * Now that you have the MailChimp List ID, you can retrieve the MailChimp member's
+		 * email address by dispatching a GET request to the list's endpoint with a filtering
+		 * query parameter:
+		 *
+		 *   GET https://us5.api.mailchimp.com/3.0/lists/{$list_id}/members?unique_email_id={$email_id}
+		 *
+		 * If the member's email address was successfully found, you now have the email address to
+		 * associate the ecommerce order with.
+		 *
+		 *   if ( $response->total_items === 1 ) {
+		 *       $email = $response->members[0]->email_address;
+		 *   }
+		 *
+		 * Set that as your order's email address, and you are good to go.
+		 *
+		 *   $order['customer']['email_address'] = $email;
+		 *
+		 * FIN
+		 * - Dave Kiss
+		 */
 
 		// Send/update order in MailChimp
 		try {
