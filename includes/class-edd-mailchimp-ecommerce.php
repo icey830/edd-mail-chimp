@@ -86,9 +86,6 @@ class EDD_MailChimp_Ecommerce {
 		// Set Ecommerce360 variables if they exist
 		$campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
 
-		if ( ! empty( $campaign_id ) ) {
-			$order['campaign_id'] = $campaign_id;
-		}
 		/**
 		 * In July 2017, the Easy Digital Downloads team decided that the email address
 		 * entered by the customer during checkout should be the authorative factor in
@@ -149,9 +146,16 @@ class EDD_MailChimp_Ecommerce {
 			$default_list = EDD_MailChimp_List::get_default();
 
 			if ( $default_list ) {
+
+				if ( ! empty( $campaign_id ) && $default_list->recipient_of_campaign( $campaign_id ) ) {
+					$order['campaign_id'] = $campaign_id;
+				}
+
 				$store = EDD_MailChimp_Store::find_or_create($default_list);
 				$store->orders->add( $order );
 			}
+
+			unset( $order['campaign_id'] );
 
 			foreach( $order->lines as $line_item ) {
 				$download = new EDD_MailChimp_Download( (int) $line_item['product_id'] );
@@ -160,6 +164,11 @@ class EDD_MailChimp_Ecommerce {
 				if ( ! empty( $preferences ) ) {
 					foreach( $preferences as $list ) {
 						$list = new EDD_MailChimp_List( $list['remote_id'] );
+
+						if ( ! empty( $campaign_id ) && $list->recipient_of_campaign( $campaign_id ) ) {
+							$order['campaign_id'] = $campaign_id;
+						}
+
 						$store = EDD_MailChimp_Store::find_or_create( $list );
 						$store->orders->add( $order );
 					}
