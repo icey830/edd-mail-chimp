@@ -3,7 +3,7 @@
 /**
  * EDD MailChimp Ecommerce class
  *
- * @copyright   Copyright (c) 2014-2017, Dave Kiss
+ * @copyright   Copyright (c) 2014-2017, Easy Digital Downloads
  * @license     http://opensource.org/licenses/gpl-2.0.php GNU Public License
  * @since       2.3
 */
