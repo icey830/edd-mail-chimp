@@ -146,28 +146,32 @@ class EDD_MailChimp_Settings {
 
 				$list = new EDD_MailChimp_List( $id );
 
-				if ( $list->exists() ) {
-					$response = $list->api->getLastResponse();
-					$response = json_decode( $response['body'] );
+				try {
+					if ( $list->exists() ) {
+						$response = $list->api->getLastResponse();
+						$response = json_decode( $response['body'] );
 
-					// Ensure it doesn't exist locally
-					if ( $list->is_connected() ) {
-						continue;
+						// Ensure it doesn't exist locally
+						if ( $list->is_connected() ) {
+							continue;
+						}
+
+						$list->name = $response->name;
+
+						// Determine if list should be set as default
+						// based on if another default list already exists.
+						$check = EDD_MailChimp_List::get_default();
+						$is_default = $check !== null ? false : true;
+
+						// Insert as new connected list
+						$list->connect( $is_default );
+
+						// Find or Create a MailChimp Store for this list and fire up a full sync job
+						$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
+						$store->sync();
 					}
-
-					$list->name = $response->name;
-
-					// Determine if list should be set as default
-					// based on if another default list already exists.
-					$check = EDD_MailChimp_List::get_default();
-					$is_default = $check !== null ? false : true;
-
-					// Insert as new connected list
-					$list->connect( $is_default );
-
-					// Find or Create a MailChimp Store for this list and fire up a full sync job
-					$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
-					$store->sync();
+				} catch ( Exception $e ) {
+					add_settings_error( 'edd-notices', '', __( 'Your MailChimp store could not be synced due to an error. ' . $e->getMessage(), 'eddmc' ), 'error' );
 				}
 			}
 		}
