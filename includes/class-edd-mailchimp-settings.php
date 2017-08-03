@@ -262,22 +262,18 @@ class EDD_MailChimp_Settings {
 					$force_list_sync_url = add_query_arg( array(
 						'settings-updated' => false,
 						'tab'              => 'extensions',
+						'section'          => 'mailchimp',
 						'edd-action' => 'mailchimp_force_list_sync',
 						'mailchimp_list_remote_id' => $list->remote_id,
 					) );
 
-					// Remove the section from the tabs so we always end up at the main section
-					$force_list_sync_url = remove_query_arg( 'section', $force_list_sync_url );
-
 					$disconnect_list_url = add_query_arg( array(
 						'settings-updated' => false,
 						'tab'              => 'extensions',
+						'section'          => 'mailchimp',
 						'edd-action' => 'mailchimp_disconnect_list',
 						'mailchimp_list_remote_id' => $list->remote_id,
 					) );
-
-					// Remove the section from the tabs so we always end up at the main section
-					$disconnect_list_url = remove_query_arg( 'section', $disconnect_list_url );
 				?>
 				<?php $connected_list_ids[] = $list->remote_id; ?>
 				<tr>
