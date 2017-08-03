@@ -191,9 +191,9 @@ class EDD_MailChimp_Settings {
 
 		ob_start();
 		?>
-		    <div class="notice notice-success">
-		        <p><?php _e( 'Your MailChimp list has been queued for syncing.', 'eddmc' ); ?></p>
-		    </div>
+		<div class="notice notice-success">
+			<p><?php _e( 'Your MailChimp list has been queued for syncing.', 'eddmc' ); ?></p>
+		</div>
 		<?php
 		echo ob_get_clean();
 	}
@@ -210,9 +210,9 @@ class EDD_MailChimp_Settings {
 
 		ob_start();
 		?>
-		    <div class="notice notice-success">
-		        <p><?php _e( 'Your MailChimp list has been disconnected from your Easy Digital Downloads store.', 'eddmc' ); ?></p>
-		    </div>
+		<div class="notice notice-success">
+			<p><?php _e( 'Your MailChimp list has been disconnected from your Easy Digital Downloads store.', 'eddmc' ); ?></p>
+		</div>
 		<?php
 		echo ob_get_clean();
 	}
@@ -226,7 +226,7 @@ class EDD_MailChimp_Settings {
 		$key = edd_get_option('eddmc_api', false);
 
 		if ( ! $key ) {
-		  return;
+			return;
 		}
 
 		$connected_list_ids = array();
@@ -261,8 +261,8 @@ class EDD_MailChimp_Settings {
 						<th><?php _e('Actions', 'eddmc'); ?></th>
 					</tr>
 				</thead>
-			<?php foreach ($lists as $list): ?>
-				<?php
+				<?php foreach ($lists as $list): ?>
+					<?php
 					$force_list_sync_url = add_query_arg( array(
 						'settings-updated' => false,
 						'tab'              => 'extensions',
@@ -278,90 +278,89 @@ class EDD_MailChimp_Settings {
 						'edd-action' => 'mailchimp_disconnect_list',
 						'mailchimp_list_remote_id' => $list->remote_id,
 					) );
-				?>
-				<?php $connected_list_ids[] = $list->remote_id; ?>
-				<tr>
-					<td>
-						<input type="radio" name="edd_settings[eddmc_default_list]" value="<?php esc_attr_e($list->remote_id); ?>" <?php checked( $list->is_default, 1 ); ?>  />
-					</td>
-					<td>
-						<span class="is-mailchimp-list-name">
-							<?php echo $list->name; ?>
-						</span>
-						<span class="is-mailchimp-list-id">ID: <?php echo $list->remote_id; ?></span>
-					</td>
+						?>
+						<?php $connected_list_ids[] = $list->remote_id; ?>
+						<tr>
+							<td>
+								<input type="radio" name="edd_settings[eddmc_default_list]" value="<?php esc_attr_e($list->remote_id); ?>" <?php checked( $list->is_default, 1 ); ?>  />
+							</td>
+							<td>
+								<span class="is-mailchimp-list-name">
+									<?php echo $list->name; ?>
+								</span>
+								<span class="is-mailchimp-list-id">ID: <?php echo $list->remote_id; ?></span>
+							</td>
 
-					<td>
-						<?php echo $list->sync_status; ?>
-						<span class="is-last-sync-date">
-							<strong><?php _e('Last Synced', 'eddmc'); ?>:</strong>
-							<?php
-								if ( $list->synced_at == '0000-00-00 00:00:00') {
-									_e('Never', 'eddmc');
-								} else {
-									echo date( 'F jS, Y \a\t g:iA', strtotime( $list->synced_at ) );
-								}
-							?>
-						</span>
-					</td>
+							<td>
+								<?php echo $list->sync_status; ?>
+								<span class="is-last-sync-date">
+									<strong><?php _e('Last Synced', 'eddmc'); ?>:</strong>
+									<?php
+									if ( $list->synced_at == '0000-00-00 00:00:00') {
+										_e('Never', 'eddmc');
+									} else {
+										echo date( 'F jS, Y \a\t g:iA', strtotime( $list->synced_at ) );
+									}
+									?>
+								</span>
+							</td>
 
-					<td>
-						<a href="<?php echo esc_url($force_list_sync_url); ?>"><?php _e('Force Sync Now', 'eddmc'); ?></a> |
-						<a class="edd-mailchimp-disconnect-list" style="color: red;" href="<?php echo esc_url($disconnect_list_url); ?>"><?php _e('Disconnect', 'eddmc'); ?></a>
-					</td>
-				</tr>
-			<?php endforeach; ?>
-			</table>
-		<?php endif; ?>
+							<td>
+								<a href="<?php echo esc_url($force_list_sync_url); ?>"><?php _e('Force Sync Now', 'eddmc'); ?></a> |
+								<a class="edd-mailchimp-disconnect-list" style="color: red;" href="<?php echo esc_url($disconnect_list_url); ?>"><?php _e('Disconnect', 'eddmc'); ?></a>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+				</table>
+			<?php endif; ?>
 
-		<?php
+			<?php
 			try {
 				$result = EDD_MailChimp_List::all();
 			} catch (Exception $e) {
 				_e('Please supply a valid MailChimp API key.', 'eddmc');
 				return;
 			}
-		?>
+			?>
 
-		<h2><?php _e('Available Lists', 'eddmc'); ?></h2>
-		<p><?php _e('Select the checkbox next to the MailChimp lists that you would like to connect to Easy Digital Downloads.', 'eddmc'); ?></p>
+			<h2><?php _e('Available Lists', 'eddmc'); ?></h2>
+			<p><?php _e('Select the checkbox next to the MailChimp lists that you would like to connect to Easy Digital Downloads.', 'eddmc'); ?></p>
 
-		<div class="is-edd-mailchimp-table-container">
-			<table class="is-edd-mailchimp-table is-edd-mailchimp-lists-table form-table wp-list-table widefat fixed posts">
-				<thead>
-					<tr>
-						<th><?php _e('MailChimp List Name', 'eddmc'); ?></th>
-						<th></th>
-					</tr>
-				</thead>
-				<tbody>
-			<?php
-			
+			<div class="is-edd-mailchimp-table-container">
+				<table class="is-edd-mailchimp-table is-edd-mailchimp-lists-table form-table wp-list-table widefat fixed posts">
+					<thead>
+						<tr>
+							<th><?php _e('MailChimp List Name', 'eddmc'); ?></th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
 
-			if ( isset( $result['lists'] ) && ! empty( $result['lists'] ) ) :
+						if ( isset( $result['lists'] ) && ! empty( $result['lists'] ) ) :
 
-				foreach ( $result['lists'] as $list ) :
+							foreach ( $result['lists'] as $list ) :
 
-					if ( in_array( $list['id'], $connected_list_ids ) ) {
-						continue;
-					}
+								if ( in_array( $list['id'], $connected_list_ids ) ) {
+									continue;
+								}
 
-					?>
+								?>
 
-					<tr>
-						<td>
-							<input type="checkbox" name="edd_settings[eddmc_connect_lists][]" value="<?php esc_attr_e($list['id']); ?>" />
-						</td>
-						<td>
-							<span class="is-mailchimp-list-name"><?php echo $list['name']; ?></span>
-							<span class="is-mailchimp-list-id">ID: <?php echo $list['id']; ?></span>
-						</td>
-					</tr>
+								<tr>
+									<td>
+										<input type="checkbox" name="edd_settings[eddmc_connect_lists][]" value="<?php esc_attr_e($list['id']); ?>" />
+									</td>
+									<td>
+										<span class="is-mailchimp-list-name"><?php echo $list['name']; ?></span>
+										<span class="is-mailchimp-list-id">ID: <?php echo $list['id']; ?></span>
+									</td>
+								</tr>
 
-			<?php endforeach; endif; ?>
-				</tbody>
-			</table>
-		</div>
-		<?php
-	}
-}
+							<?php endforeach; endif; ?>
+						</tbody>
+					</table>
+				</div>
+				<?php
+			}
+		}
