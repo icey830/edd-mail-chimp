@@ -105,7 +105,7 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
 				'currency_code'  => edd_get_currency(),
 				'money_format'   => edd_currency_filter( '' ),
 				'primary_locale' => substr( get_locale(), 0, 2 ),
-				'timezone'       => get_site_option('timezone_string')
+				'timezone'       => edd_get_timezone_id(),
 			),
 			$args
 		);
