@@ -257,7 +257,10 @@ class EDD_MailChimp_Settings {
 					<tr>
 						<th><?php _e('Default', 'eddmc'); ?></th>
 						<th><?php _e('Connected List Name', 'eddmc'); ?></th>
-						<th><?php _e('Status', 'eddmc'); ?></th>
+						<th>
+							<?php _e('Ecommerce Data', 'eddmc'); ?>
+							<span alt="f223" class="edd-help-tip dashicons dashicons-editor-help" title="<strong><?php _e('Ecommerce Data', 'eddmc'); ?></strong>: <?php _e('Your Easy Digital Downloads store contains order information that can be used within MailChimp to enhance communication with your customer. Use this syncing feature to ensure all of your store information is up-to-date on your MailChimp account.', 'eddmc'); ?>"></span>
+						</th>
 						<th><?php _e('Actions', 'eddmc'); ?></th>
 					</tr>
 				</thead>
