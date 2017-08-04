@@ -41,7 +41,6 @@
 
 
 .is-edd-mailchimp-table-container {
-  height: 20em;
 
   table {
     display: flex;
@@ -57,7 +56,6 @@
     tbody {
       flex: 1 1 auto;
       display: block;
-      overflow-y: scroll;
 
       tr {
         width: 100%;
