@@ -157,6 +157,29 @@ class EDD_MailChimp {
 		new EDD_MailChimp_Settings;
 		new EDD_MailChimp_Sync;
 	}
+
+
+	/**
+	 * Provides a backwards-compatible method to subscribe users to a MailChimp list.
+	 *
+	 * @deprecated 3.0 Use EDD_MailChimp_List subscribe method
+	 * @return boolean true if the user was successfully subscribed, false otherwise.
+	 */
+	public function subscribe_email($user_info = array(), $list_id = false, $prevent_opt_in = false) {
+		_deprecated_function( __FUNCTION__, '3.0', 'EDD_MailChimp_List' );
+
+		$list = $list_id !== false ? new EDD_MailChimp_List( $list_id ) : EDD_MailChimp_List::get_default();
+
+		// Maintains the same behavior as the previously-named $opt_in_overrid(d)e
+		// If the user has enabled opt-in in settings, but passed `true` as the $prevent_opt_in value,
+		// override the preference stored in the user settings.
+		if ( $prevent_opt_in ) {
+			$options['double_opt_in'] = false;
+		}
+
+		$result = $list->subscribe( $user_info, $options );
+		return $result;
+	}
 }
 
 $GLOBALS['eddmc'] = EDD_MailChimp::instance();
