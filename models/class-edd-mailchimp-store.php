@@ -44,7 +44,8 @@ class EDD_MailChimp_Store extends EDD_MailChimp_Model {
 			return $klass;
 		}
 
-		throw new Exception( __('Could not find or create this store on MailChimp', 'eddmc') );
+		$error = $klass->api->getLastError();
+		throw new Exception( $error );
 	}
 
 
