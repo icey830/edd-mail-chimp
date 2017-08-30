@@ -146,6 +146,11 @@ class EDD_MailChimp_V3_Upgrade {
 
 				foreach ( (array) $settings as $index => $list ) {
 
+					// Account for weird empty list values
+					if ( empty( $list ) ) {
+						continue;
+					}
+
 					if ( strpos( $list, '|' ) != false ) {
 
 						// This is an old style setting for MailChimp API v2,
