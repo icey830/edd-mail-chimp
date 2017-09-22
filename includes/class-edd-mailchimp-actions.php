@@ -48,6 +48,7 @@ class EDD_MailChimp_Actions {
 				$redirect_url = add_query_arg( array(
 					'settings-updated' => false,
 					'tab'              => 'extensions',
+					'section'          => 'mailchimp',
 					'edd_mailchimp_list_queued' => 1,
 				) );
 
