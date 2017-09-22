@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: EDD Mail Chimp\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-17 16:04-0600\n"
-"PO-Revision-Date: 2015-02-17 16:04-0600\n"
-"Last-Translator: Pippin Williamson <pippin@pippinsplugins.com>\n"
+"POT-Creation-Date: 2017-09-21 21:07-0600\n"
+"PO-Revision-Date: 2017-09-21 21:07-0600\n"
+"Last-Translator: Chris Christoff <chriscct7@gmail.com>\n"
 "Language-Team: Pippin's Plugins <pippin@pippinsplugins.com>\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
@@ -12,76 +12,250 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e;_n;_x\n"
 "X-Poedit-Basepath: .\n"
-"X-Generator: Poedit 1.7.3\n"
+"X-Generator: Poedit 1.6.3\n"
 "X-Poedit-SearchPath-0: ..\n"
 
-#: ../includes/class-edd-ecommerce360.php:188
-msgid "Order details have been added to MailChimp successfully"
+#: ../edd-mailchimp.php:15
+msgid ""
+"Your version of PHP is below the minimum version of PHP required by Easy "
+"Digital Downloads - MailChimp. Please contact your host and request that "
+"your version be upgraded to 5.3.3 or later."
 msgstr ""
 
-#: ../includes/class-edd-ecommerce360.php:190
-#: ../includes/class-edd-ecommerce360.php:230
-msgid "MailChimp Ecommerce360 Error: "
-msgstr ""
-
-#: ../includes/class-edd-ecommerce360.php:227
-msgid "Order details have been removed from MailChimp successfully"
-msgstr ""
-
-#: ../includes/class-edd-mailchimp.php:20
+#: ../includes/class-edd-mailchimp-checkout.php:27
 msgid "Signup for the newsletter"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:65
-msgid "Mail Chimp Settings"
+#: ../includes/class-edd-mailchimp-ecommerce.php:179
+msgid "Order details have been updated in MailChimp successfully"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:66
-msgid "Configure Mail Chimp Integration Settings"
+#: ../includes/class-edd-mailchimp-ecommerce.php:181
+#: ../includes/class-edd-mailchimp-ecommerce.php:228
+msgid "MailChimp Ecommerce360 Error: "
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:71
-msgid "Mail Chimp API Key"
+#: ../includes/class-edd-mailchimp-ecommerce.php:225
+msgid "Order details have been removed from MailChimp."
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:72
-msgid "Enter your Mail Chimp API key"
+#: ../includes/class-edd-mailchimp-metabox.php:87
+msgid "Select the lists you wish buyers to be subscribed to when purchasing."
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:78
+#: ../includes/class-edd-mailchimp-metabox.php:110
+msgid ""
+"Please visit the EDD MailChimp settings page to connect your MailChimp lists "
+"to your EDD site."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-metabox.php:117
+msgid ""
+"Check this box if purchasers of this product should be required to confirm "
+"their subscription to your MailChimp list."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-metabox.php:120
+msgid "Require Double Opt-In"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:28
+msgid "MailChimp"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:40
+msgid "MailChimp Settings"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:41
+msgid "Configure MailChimp Integration Settings"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:46
+msgid "MailChimp API Key"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:47
+msgid "Enter your MailChimp API key"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:53
 msgid "Show Signup on Checkout"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:79
-msgid "Allow customers to signup for the list selected below during checkout?"
+#: ../includes/class-edd-mailchimp-settings.php:54
+msgid ""
+"Allow customers to signup for the default list selected below during "
+"checkout?"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:84
-msgid "Choose a list"
+#: ../includes/class-edd-mailchimp-settings.php:59
+msgid "Signup Checked by Default"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:85
-msgid "Select the list you wish to subscribe buyers to"
+#: ../includes/class-edd-mailchimp-settings.php:60
+msgid ""
+"Should the newsletter signup checkbox shown during checkout be checked by "
+"default?"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:91
+#: ../includes/class-edd-mailchimp-settings.php:65
 msgid "Checkout Label"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:92
+#: ../includes/class-edd-mailchimp-settings.php:66
 msgid "This is the text shown next to the signup option"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:98
+#: ../includes/class-edd-mailchimp-settings.php:72
 msgid "Double Opt-In"
 msgstr ""
 
-#: ../includes/class-edd-mailchimp.php:99
+#: ../includes/class-edd-mailchimp-settings.php:73
 msgid ""
 "When checked, users will be sent a confirmation email after signing up, and "
 "will only be added once they have confirmed the subscription."
 msgstr ""
 
-#: ../includes/class-edd-newsletter.php:213
-msgid "Select the lists you wish buyers to be subscribed to when purchasing."
+#: ../includes/class-edd-mailchimp-settings.php:78
+msgid "Replace Interests"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:79
+msgid ""
+"When checked, a MailChimp subscriber's interests will be replaced during new "
+"purchases rather than merged."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:84
+msgid "Record Ecommerce Data in Test Mode"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:85
+msgid ""
+"When checked, all purchase data will still be recorded in MailChimp when "
+"your EDD store is in Test Mode."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:174
+msgid "Your MailChimp store could not be synced due to an error. "
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:195
+msgid "Your MailChimp list has been queued for syncing."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:214
+msgid ""
+"Your MailChimp list has been disconnected from your Easy Digital Downloads "
+"store."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:236
+msgid "Connected Lists"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:239
+msgid ""
+"There are currently no MailChimp lists connected to Easy Digital Downloads."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:246
+msgid "Are you sure you want to disconnect this list?"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:254
+msgid ""
+"These are the MailChimp lists that are currently connected to Easy Digital "
+"Downloads."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:258
+msgid "Default"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:259
+msgid "Connected List Name"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:261
+#: ../includes/class-edd-mailchimp-settings.php:262
+msgid "Ecommerce Data"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:262
+msgid ""
+"Your Easy Digital Downloads store contains order information that can be "
+"used within MailChimp to enhance communication with your customer. Use this "
+"syncing feature to ensure all of your store information is up-to-date on "
+"your MailChimp account."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:264
+msgid "Actions"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:300
+msgid "Last Synced"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:303
+msgid "Never"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:312
+msgid "Force Sync Now"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:313
+msgid "Disconnect"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:324
+msgid "Please supply a valid MailChimp API key."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:329
+msgid "Available Lists"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:330
+msgid ""
+"Select the checkbox next to the MailChimp lists that you would like to "
+"connect to Easy Digital Downloads."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-settings.php:336
+msgid "MailChimp List Name"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-v3-upgrade.php:59
+#, php-format
+msgid ""
+"Easy Digital Downloads needs to upgrade your MailChimp settings, click <a "
+"href=\"%s\">here</a> to start the upgrade."
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-v3-upgrade.php:259
+msgid "You do not have permission to do shop upgrades"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-v3-upgrade.php:259
+#: ../includes/class-edd-mailchimp-v3-upgrade.php:275
+msgid "Error"
+msgstr ""
+
+#: ../includes/class-edd-mailchimp-v3-upgrade.php:275
+msgid ""
+"Please make sure to set your MailChimp API key on the Easy Digital Downloads "
+"extension settings page and try running this upgrade again."
+msgstr ""
+
+#: ../models/class-edd-mailchimp-store.php:102
+msgid "Easy Digital Downloads"
+msgstr ""
+
+#: ../vendor/a5hleyrich/wp-background-processing/classes/wp-background-process.php:425
+#, php-format
+msgid "Every %d Minutes"
 msgstr ""
