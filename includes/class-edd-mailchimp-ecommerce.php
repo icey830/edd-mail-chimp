@@ -179,7 +179,7 @@ class EDD_MailChimp_Ecommerce {
 						$store = EDD_MailChimp_Store::find_or_create( $list );
 						$store->orders->add( $order );
 			
-						edd_debug_log( 'add_order(): payment ' . $payment_id . ' order added for list ' . $list['remote_id'] . '. Order data: ' . print_r( $order, true ) );
+						edd_debug_log( 'add_order(): payment ' . $payment_id . ' order added for list ' . $list->remote_id . '. Order data: ' . print_r( $order, true ) );
 
 					}
 				}
