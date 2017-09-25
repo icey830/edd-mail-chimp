@@ -133,18 +133,25 @@ class EDD_MailChimp_V3_Upgrade {
 		$this->products();
 		$this->total_products();
 
+		edd_debug_log( 'convert_grouping_data(): conversion loop running' );
+
 		if ( ! empty( $this->products->posts ) ) {
 			foreach( $this->products->posts as $product ) {
 
+				edd_debug_log( 'convert_grouping_data(): conversion loop processing for Download ' . $product->ID );
+		
 				$settings = get_post_meta( $product->ID, '_edd_mailchimp', true );
 
 				if ( empty( $settings ) ) {
+					edd_debug_log( 'convert_grouping_data(): conversion loop stopped for Download ' . $product->ID . ' as there are not product-specific lists assigned' );
 					continue;
 				}
 
 				$download = new EDD_MailChimp_Download( (int) $product->ID );
 
 				foreach ( (array) $settings as $index => $list ) {
+
+					edd_debug_log( 'convert_grouping_data(): converting lists for Download ' . $product->ID );
 
 					// Account for weird empty list values
 					if ( empty( $list ) ) {
@@ -153,6 +160,7 @@ class EDD_MailChimp_V3_Upgrade {
 
 					if ( strpos( $list, '|' ) != false ) {
 
+						edd_debug_log( 'convert_grouping_data(): converting oldlist ' . $list . ' for Download ' . $product->ID );
 						// This is an old style setting for MailChimp API v2,
 						// so we need to convert here. $list may look like any
 						// of the following entries:
@@ -180,7 +188,12 @@ class EDD_MailChimp_V3_Upgrade {
 						// Connect the list locally and begin sync if not exists.
 						$list = new EDD_MailChimp_List( $list_id );
 
+						edd_debug_log( 'convert_grouping_data(): list ID determined as ' . $list_id . ' for Download ' . $product->ID );
+
 						if ( ! $list->is_connected() && $list->exists ) {
+
+							edd_debug_log( 'convert_grouping_data(): list ID ' . $list_id . ' not connected but does exist' );
+
 							$response = $list->api->getLastResponse();
 							$record = json_decode( $response['body'], true );
 
@@ -192,6 +205,9 @@ class EDD_MailChimp_V3_Upgrade {
 
 							// @todo Make sure multiple store sync jobs can be queued at the same time.
 							$store->sync();
+					
+							edd_debug_log( 'convert_grouping_data(): list ID ' . $list->remote_id . ' synced with store ' . $store->id );
+					
 						}
 
 						$interests = $list->interests();
@@ -201,6 +217,7 @@ class EDD_MailChimp_V3_Upgrade {
 						foreach ( $interests as $interest ) {
 							if ( strtolower( $interest->interest_name ) === strtolower( $interest_name ) ) {
 								$download->add_preferred_interest( (int) $interest->id );
+								edd_debug_log( 'convert_grouping_data(): added preferred interest ' . $interest->id . ' to ' . $download->ID );
 							}
 						}
 
@@ -210,6 +227,9 @@ class EDD_MailChimp_V3_Upgrade {
 						$list = new EDD_MailChimp_List( $list );
 
 						if ( ! $list->is_connected() && $list->exists() ) {
+						
+							edd_debug_log( 'convert_grouping_data(): list ID ' . $list->remote_id . ' not connected but does exist' );
+						
 							$response = $list->api->getLastResponse();
 							$record = json_decode( $response['body'], true );
 
@@ -218,6 +238,9 @@ class EDD_MailChimp_V3_Upgrade {
 
 							$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 							$store->sync();
+
+							edd_debug_log( 'convert_grouping_data(): list ID ' . $list->remote_id . ' synced with store ' . $store->id );
+					
 						}
 
 					}
@@ -226,9 +249,14 @@ class EDD_MailChimp_V3_Upgrade {
 
 					// Assign this list as a download-specific preference.
 					$download->add_preferred_list( (int) $list->id );
+
+					edd_debug_log( 'convert_grouping_data(): added preferred list ' . $list->id . ' to ' . $download->ID );
+
 				}
 
 			}
+
+			edd_debug_log( 'convert_grouping_data(): step ' . $this->step . ' completed' );
 
 			$this->step++;
 			$redirect = add_query_arg( array(
@@ -239,8 +267,10 @@ class EDD_MailChimp_V3_Upgrade {
 			), admin_url( 'index.php' ) );
 
 			self::redirect( $redirect );
+
 		} else {
 
+			edd_debug_log( 'convert_grouping_data(): upgrade routine completed' );
 			// No more products found, finish up
 			delete_transient( 'edd_mailchimp_list_data' );
 			self::mark_as_complete();

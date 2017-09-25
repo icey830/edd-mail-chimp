@@ -25,15 +25,23 @@ class EDD_MailChimp_Actions {
 		$list_id = sanitize_key( $request['mailchimp_list_remote_id'] );
 
 		if ( $list_id ) {
+
+			edd_debug_log( 'force_list_sync() started for ' . $list_id );
+
 			$list = new EDD_MailChimp_List( $list_id );
 
 			if ( $list->is_connected() && $list->exists() ) {
+
+				edd_debug_log( 'force_list_sync(): list is connected and exists' );
+
 				$response = $list->api->getLastResponse();
 				$record = json_decode( $response['body'], true );
 
 				// Find or Create a MailChimp Store for this list and fire up a full sync job
 				$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 				$store->sync();
+
+				edd_debug_log( 'force_list_sync(): list store sync completed' );
 
 				global $wpdb;
 
@@ -44,6 +52,8 @@ class EDD_MailChimp_Actions {
 					array( '%s'),
 					array( '%s' )
 				);
+
+				edd_debug_log( 'force_list_sync(): list sync_status set to pending' );
 
 				$redirect_url = add_query_arg( array(
 					'settings-updated' => false,
@@ -71,12 +81,17 @@ class EDD_MailChimp_Actions {
 		$list_id = sanitize_key( $request['mailchimp_list_remote_id'] );
 
 		if ( $list_id ) {
+
+			edd_debug_log( 'disconnect_list(): attempting to disconnect list ' . $list_id );
+
 			try {
 				$list = new EDD_MailChimp_List( $list_id );
 
 				if ( $list->is_connected() ) {
 
 					$list->disconnect();
+
+					edd_debug_log( 'disconnect_list(): list ' . $list_id . ' disconnected' );
 
 					$redirect_url = add_query_arg( array(
 						'settings-updated' => false,
@@ -107,6 +122,9 @@ class EDD_MailChimp_Actions {
 	 */
 	public function upsert_product( $id, $post ) {
 		if ( $post->post_status !== 'publish' ) {
+
+			edd_debug_log( 'upsert_product(): product ' . $id . ' not pushed to MailChimp because it is not published' );
+
 			return;
 		}
 
@@ -114,8 +132,13 @@ class EDD_MailChimp_Actions {
 		$lists = EDD_MailChimp_List::connected();
 
 		foreach( $lists as $list ) {
+
+			edd_debug_log( 'upsert_product(): pushing product ' . $id . ' for  ' . $list->remote_id );
+
 			$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 			$store->products->add( $product );
+
+			edd_debug_log( 'upsert_product(): pushed product ' . $id . ' for  ' . $list->remote_id );
 		}
 	}
 
@@ -138,6 +161,8 @@ class EDD_MailChimp_Actions {
 		foreach( $lists as $list ) {
 			$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 			$store->customers->add( $customer );
+
+			edd_debug_log( 'create_customer(): created customer ' . $id . ' for  ' . $list->remote_id );
 		}
 	}
 
@@ -169,6 +194,9 @@ class EDD_MailChimp_Actions {
 	 * Check if a customer needs to be subscribed on completed purchase of specific products
 	 */
 	public function completed_purchase_signup( $payment_id = 0 ) {
+
+		edd_debug_log( 'completed_purchase_signup() started for payment ' . $payment_id );
+
 		$payment = new EDD_Payment( $payment_id );
 
 		$user = array(
@@ -178,6 +206,8 @@ class EDD_MailChimp_Actions {
 		);
 
 		$default_list = EDD_MailChimp_List::get_default();
+
+		edd_debug_log( 'completed_purchase_signup() default list found is ' . $default_list->remote_id );
 
 		if ( $default_list ) {
 			$result = $default_list->subscribe( $user );
@@ -191,11 +221,18 @@ class EDD_MailChimp_Actions {
 			$double_opt_in = get_post_meta( $post->ID, 'edd_mailchimp_double_opt_in', true );
 
 			foreach( $preferences as $preference ) {
+
 				$list = new EDD_MailChimp_List( $preference['remote_id'] );
 				$options = array( 'interests' => $preference['interests'] );
 				$is_double_opt_in = empty( $double_opt_in );
 				$options['double_opt_in'] = $is_double_opt_in;
-				$list->subscribe( $user, $options );
+
+				edd_debug_log( 'completed_purchase_signup() about to subscribe customer. User data: ' . print_r( $user, true ) . 'Options data: ' . print_r( $options, true ) );
+
+				$subscribed = $list->subscribe( $user, $options );
+			
+				edd_debug_log( 'completed_purchase_signup() customer subscription result: ' . var_export( $subscribed ) );
+			
 			}
 		}
 	}

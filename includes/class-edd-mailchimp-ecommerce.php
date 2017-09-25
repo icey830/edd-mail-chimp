@@ -78,6 +78,7 @@ class EDD_MailChimp_Ecommerce {
 
 		// Don't record details if we're in test mode and user prefers not to record.
 		if ( edd_is_test_mode() && $record_test_mode === false ) {
+			edd_debug_log( 'add_order(): order ' . $payment_id . ' not added because test mode is enabled or recording of orders in test mode is disabled' );
 			return;
 		}
 
@@ -85,6 +86,7 @@ class EDD_MailChimp_Ecommerce {
 
 		// Set Ecommerce360 variables if they exist
 		$campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
+		edd_debug_log( 'add_order(): campaign ID for payment ' . $payment_id . ' is: ' . $campaign_id );
 
 		/**
 		 * In July 2017, the Easy Digital Downloads team decided that the email address
@@ -147,12 +149,17 @@ class EDD_MailChimp_Ecommerce {
 
 			if ( $default_list ) {
 
+				edd_debug_log( 'add_order(): default list found: ' . $default_list->remote_id );
+
 				if ( ! empty( $campaign_id ) && $default_list->recipient_of_campaign( $campaign_id ) ) {
 					$order->campaign_id = $campaign_id;
 				}
 
 				$store = EDD_MailChimp_Store::find_or_create($default_list);
 				$store->orders->add( $order );
+
+				edd_debug_log( 'add_order(): payment ' . $payment_id . ' order added for default list. Order data: ' . print_r( $order, true ) );
+
 			}
 
 			unset( $order->campaign_id );
@@ -171,13 +178,16 @@ class EDD_MailChimp_Ecommerce {
 
 						$store = EDD_MailChimp_Store::find_or_create( $list );
 						$store->orders->add( $order );
-						
+			
+						edd_debug_log( 'add_order(): payment ' . $payment_id . ' order added for list ' . $list['remote_id'] . '. Order data: ' . print_r( $order, true ) );
+
 					}
 				}
 			}
 
 			edd_insert_payment_note( $payment_id, __( 'Order details have been updated in MailChimp successfully', 'eddmc' ) );
-		} catch (Exception $e) {
+		} catch ( Exception $e ) {
+			edd_debug_log( 'add_order(): Exception encountered for payment ' . $payment_id . '. Exception message: ' . $e->getMessage() );
 			edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
 			return false;
 		}
@@ -201,12 +211,15 @@ class EDD_MailChimp_Ecommerce {
 
 		$order = new EDD_MailChimp_Order( $payment_id );
 
+		edd_debug_log( 'remove_order() processing for ' . $payment_id );
+
 		try {
 			$default_list = EDD_MailChimp_List::get_default();
 
 			if ( $default_list ) {
 				$store = EDD_MailChimp_Store::find_or_create( $default_list );
 				$store->orders->remove( $order );
+				edd_debug_log( 'remove_order(): Order ' . $payment_id . ' removed from default list ' . $default_list->remote_id );
 			}
 
 			foreach( $order->lines as $line_item ) {
@@ -218,6 +231,7 @@ class EDD_MailChimp_Ecommerce {
 						$list = new EDD_MailChimp_List( $list['remote_id'] );
 						$store = EDD_MailChimp_Store::find_or_create( $list );
 						$store->orders->remove( $order );
+						edd_debug_log( 'remove_order(): Order ' . $payment_id . ' removed from default list ' . $list->remote_id );
 					}
 				}
 			}
@@ -225,6 +239,7 @@ class EDD_MailChimp_Ecommerce {
 			edd_insert_payment_note( $payment_id, __( 'Order details have been removed from MailChimp.', 'eddmc' ) );
 			return true;
 		} catch (Exception $e) {
+			edd_debug_log( 'remove_order(): Exception encountered while removing ' . $payment_id . ' from list' );
 			edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
 			return false;
 		}

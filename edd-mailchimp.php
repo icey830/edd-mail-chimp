@@ -183,3 +183,9 @@ class EDD_MailChimp {
 }
 
 $GLOBALS['eddmc'] = EDD_MailChimp::instance();
+
+if( ! function_exists( 'edd_debug_log' ) ) {
+	function edd_debug_log( $message = '' ) {
+		error_log( $message, 3,  trailingslashit( wp_upload_dir() ) . 'edd-debug-log.txt' );
+	}
+}
