@@ -12,7 +12,7 @@ class EDD_MailChimp_Ecommerce {
 	public function __construct() {
 		add_action( 'init', array( $this, 'set_ecommerce_session' ) );
 		add_action( 'edd_insert_payment', array( $this, 'set_ecommerce_flags' ), 10, 2 );
-		add_action( 'edd_complete_purchase', array( $this, 'add_order' ), 20, 1 );
+		add_action( 'edd_complete_purchase', array( $this, 'add_order' ), 20, 3 );
 		add_action( 'edd_update_payment_status', array( $this, 'remove_order' ), 10, 3 );
 	}
 
@@ -69,10 +69,12 @@ class EDD_MailChimp_Ecommerce {
 	/**
 	 * Send purchase details to MailChimp's Ecommerce360 extension.
 	 *
-	 * @param  integer $payment_id    [description]
+	 * @param  integer $payment_id   Payment ID number
+	 * @param  object  $payment      EDD_Payment object
+	 * @param  object  $customer     EDD_Customer object
 	 * @return bool
 	 */
-	public function add_order( $payment_id = 0 ) {
+	public function add_order( $payment_id = 0, $payment, $customer  ) {
 
 		$record_test_mode = edd_get_option('eddmc_record_test_mode');
 
@@ -86,6 +88,7 @@ class EDD_MailChimp_Ecommerce {
 
 		// Set Ecommerce360 variables if they exist
 		$campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
+
 		edd_debug_log( 'add_order(): campaign ID for payment ' . $payment_id . ' is: ' . $campaign_id );
 
 		/**
@@ -186,10 +189,13 @@ class EDD_MailChimp_Ecommerce {
 			}
 
 			edd_insert_payment_note( $payment_id, __( 'Order details have been updated in MailChimp successfully', 'eddmc' ) );
+
 		} catch ( Exception $e ) {
+
 			edd_debug_log( 'add_order(): Exception encountered for payment ' . $payment_id . '. Exception message: ' . $e->getMessage() );
 			edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
 			return false;
+
 		}
 
 		return true;
@@ -201,6 +207,7 @@ class EDD_MailChimp_Ecommerce {
 	 * @return bool
 	 */
 	public function remove_order( $payment_id, $new_status, $old_status) {
+
 		if ( 'publish' != $old_status && 'revoked' != $old_status ) {
 			return;
 		}
@@ -238,11 +245,13 @@ class EDD_MailChimp_Ecommerce {
 
 			edd_insert_payment_note( $payment_id, __( 'Order details have been removed from MailChimp.', 'eddmc' ) );
 			return true;
+
 		} catch (Exception $e) {
 			edd_debug_log( 'remove_order(): Exception encountered while removing ' . $payment_id . ' from list' );
 			edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
 			return false;
 		}
+
 	}
 
 	/**
