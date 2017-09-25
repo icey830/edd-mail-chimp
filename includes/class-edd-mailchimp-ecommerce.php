@@ -158,7 +158,7 @@ class EDD_MailChimp_Ecommerce {
 					$order->campaign_id = $campaign_id;
 				}
 
-				$store = EDD_MailChimp_Store::find_or_create($default_list);
+				$store = EDD_MailChimp_Store::find_or_create( $default_list );
 				$store->orders->add( $order );
 
 				edd_debug_log( 'add_order(): payment ' . $payment_id . ' order added for default list. Order data: ' . print_r( $order, true ) );
