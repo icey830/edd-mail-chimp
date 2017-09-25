@@ -19,14 +19,14 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 	 * [_set_payment description]
 	 * @param [type] $payment [description]
 	 */
-	protected function _set_payment($payment) {
-		if ( is_integer($payment) ) {
+	protected function _set_payment( $payment ) {
+		if ( is_integer( $payment ) ) {
 			$this->_payment = new EDD_Payment($payment);
-		} elseif ( is_object( $payment ) && get_class($payment) === 'EDD_Payment' ) {
+		} elseif ( is_object( $payment ) && get_class( $payment ) === 'EDD_Payment' ) {
 			$this->_payment = $payment;
 		}
 
-		$this->id = apply_filters('edd.mailchimp.order.id', $this->_payment->ID, $this->_payment);
+		$this->id = apply_filters( 'edd.mailchimp.order.id', $this->_payment->ID, $this->_payment );
 	}
 
 
@@ -35,6 +35,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 	 * @return [type] [description]
 	 */
 	protected function _build() {
+
 		$customer = new EDD_MailChimp_Customer( (int) $this->_payment->customer_id );
 
 		$order = array(
@@ -42,7 +43,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 			'customer' => array(
 				'id'            => $this->_payment->customer_id,
 				'email_address' => $this->_payment->email,
-				'opt_in_status' => apply_filters('edd.mailchimp.customer.opt_in_status', false, $customer, $this->_payment), // false => transactional, true => subscribed
+				'opt_in_status' => apply_filters( 'edd.mailchimp.customer.opt_in_status', false, $customer, $this->_payment ), // false => transactional, true => subscribed
 				// 'company'       => '',
 				'first_name'    => $this->_payment->first_name,
 				'last_name'     => $this->_payment->last_name,
@@ -104,7 +105,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 			);
 		}
 
-		$this->_record = apply_filters('edd.mailchimp.order', $order, $this->_payment);
+		$this->_record = apply_filters( 'edd.mailchimp.order', $order, $this->_payment );
 		return $this;
 	}
 }
