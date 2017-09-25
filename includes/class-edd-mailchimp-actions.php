@@ -231,7 +231,7 @@ class EDD_MailChimp_Actions {
 
 				$subscribed = $list->subscribe( $user, $options );
 			
-				edd_debug_log( 'completed_purchase_signup() customer subscription result: ' . var_export( $subscribed ) );
+				edd_debug_log( 'completed_purchase_signup() customer subscription result: ' . var_export( $subscribed, true ) );
 			
 			}
 		}

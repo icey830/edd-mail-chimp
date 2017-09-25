@@ -50,7 +50,7 @@ class EDD_MailChimp_Checkout {
 
 			if ( $default_list ) {
 				$subscribed = $default_list->subscribe( $user_info );
-				edd_debug_log( 'checkout_signup() customer subscription result: ' . var_export( $subscribed ) );
+				edd_debug_log( 'checkout_signup() customer subscription result: ' . var_export( $subscribed, true ) );
 			}
 		}
 	}
