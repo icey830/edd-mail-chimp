@@ -21,7 +21,7 @@ class EDD_MailChimp_Customer extends EDD_MailChimp_Model {
 			$this->_customer = $customer;
 		}
 
-		$this->id = apply_filters( 'edd.mailchimp.customer.id', $this->customer->id, $this->customer );
+		$this->id = apply_filters( 'edd.mailchimp.customer.id', $this->_customer->id, $this->_customer );
 	}
 
 	/**
