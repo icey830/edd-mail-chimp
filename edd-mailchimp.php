@@ -42,7 +42,7 @@ class EDD_MailChimp {
 	}
 
 	public function __construct() {
-		add_action('plugins_loaded', array( $this, 'load_upgrade_routine') );
+		add_action( 'admin_init', array( $this, 'load_upgrade_routine' ) );
 		add_action( 'init', array( $this, 'textdomain' ) );
 	}
 
@@ -138,6 +138,7 @@ class EDD_MailChimp {
 		require_once( EDD_MAILCHIMP_PATH . '/models/class-edd-mailchimp-store.php' );
 
 		// Includes
+		require_once( EDD_MAILCHIMP_PATH . '/includes/functions.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-database.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-download.php' );
 		require_once( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-actions.php' );
@@ -183,10 +184,7 @@ class EDD_MailChimp {
 	}
 }
 
-$GLOBALS['eddmc'] = EDD_MailChimp::instance();
-
-if( ! function_exists( 'edd_debug_log' ) ) {
-	function edd_debug_log( $message = '' ) {
-		error_log( $message, 3,  trailingslashit( wp_upload_dir() ) . 'edd-debug-log.txt' );
-	}
+function edd_mc_load() {
+	$GLOBALS['eddmc'] = EDD_MailChimp::instance();
 }
+add_action( 'plugins_loaded', 'edd_mc_load' );
