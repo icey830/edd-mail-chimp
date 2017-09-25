@@ -26,7 +26,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 			$this->_payment = $payment;
 		}
 
-		$this->id = apply_filters('edd.mailchimp.order.id', $this->_payment->number, $this->_payment);
+		$this->id = apply_filters('edd.mailchimp.order.id', $this->_payment->ID, $this->_payment);
 	}
 
 
@@ -38,7 +38,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 		$customer = new EDD_MailChimp_Customer( (int) $this->_payment->customer_id );
 
 		$order = array(
-			'id'       => (string) $this->_payment->number,
+			'id'       => (string) $this->_payment->ID,
 			'customer' => array(
 				'id'            => $this->_payment->customer_id,
 				'email_address' => $this->_payment->email,
