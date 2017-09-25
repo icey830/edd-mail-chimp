@@ -91,7 +91,7 @@ class EDD_MailChimp_Checkout {
 			$download = new EDD_MailChimp_Download( (int) $line['id'] );
 			$preferences = $download->subscription_preferences();
 
-			$double_opt_in = get_post_meta( $post->ID, 'edd_mailchimp_double_opt_in', true );
+			$double_opt_in = get_post_meta( $line['id'], 'edd_mailchimp_double_opt_in', true );
 
 			foreach( $preferences as $preference ) {
 
