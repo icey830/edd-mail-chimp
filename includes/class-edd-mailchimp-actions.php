@@ -41,7 +41,7 @@ class EDD_MailChimp_Actions {
 				$store = EDD_MailChimp_Store::find_or_create( $list->remote_id );
 				$store->sync();
 
-				edd_debug_log( 'force_list_sync(): list store sync completed' );
+				edd_debug_log( 'force_list_sync(): list store sync queued successfully' );
 
 				global $wpdb;
 
