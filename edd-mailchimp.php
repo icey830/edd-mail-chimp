@@ -165,7 +165,8 @@ class EDD_MailChimp {
 	 * @deprecated 3.0 Use EDD_MailChimp_List subscribe method
 	 * @return boolean true if the user was successfully subscribed, false otherwise.
 	 */
-	public function subscribe_email($user_info = array(), $list_id = false, $prevent_opt_in = false) {
+	public function subscribe_email( $user_info = array(), $list_id = false, $prevent_opt_in = false ) {
+
 		_deprecated_function( __FUNCTION__, '3.0', 'EDD_MailChimp_List' );
 
 		$list = $list_id !== false ? new EDD_MailChimp_List( $list_id ) : EDD_MailChimp_List::get_default();
