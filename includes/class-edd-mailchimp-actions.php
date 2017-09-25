@@ -8,9 +8,7 @@ class EDD_MailChimp_Actions {
 	public function __construct() {
 		add_action( 'edd_save_download', array( $this, 'upsert_product' ), 10, 2 );
 		add_action( 'edd_customer_post_create', array( $this, 'create_customer' ), 10, 2 );
-		// add_action( 'edd_cart_contents_loaded_from_session', array( $this, 'set_cart' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'load_admin_scripts') );
-		add_action( 'edd_complete_download_purchase', array( $this, 'hook_signup' ), 10, 3 );
 		add_action( 'edd_mailchimp_force_list_sync', array( $this, 'force_list_sync') );
 		add_action( 'edd_mailchimp_disconnect_list', array( $this, 'disconnect_list') );
 	}
@@ -166,15 +164,6 @@ class EDD_MailChimp_Actions {
 		}
 	}
 
-
-	/**
-	 * Backwards compatibility to add an action for signups
-	 * through the edd_complete_download_purchase action
-	 */
-	public function hook_signup() {
-		add_action( 'edd_complete_purchase', array( $this, 'completed_purchase_signup' ) );
-	}
-
 	/**
 	 * Load required admin scripts and styles here.
 	 * @param  string $hook Current admin page
@@ -188,53 +177,6 @@ class EDD_MailChimp_Actions {
 
 		wp_register_style('edd-mailchimp', EDD_MAILCHIMP_URL . 'assets/dist/css/main.css');
 		wp_enqueue_style('edd-mailchimp');
-	}
-
-	/**
-	 * Check if a customer needs to be subscribed on completed purchase of specific products
-	 */
-	public function completed_purchase_signup( $payment_id = 0 ) {
-
-		edd_debug_log( 'completed_purchase_signup() started for payment ' . $payment_id );
-
-		$payment = new EDD_Payment( $payment_id );
-
-		$user = array(
-			'first_name' => $payment->first_name,
-			'last_name'  => $payment->last_name,
-			'email'      => $payment->email,
-		);
-
-		$default_list = EDD_MailChimp_List::get_default();
-
-		edd_debug_log( 'completed_purchase_signup() default list found is ' . $default_list->remote_id );
-
-		if ( $default_list ) {
-			$result = $default_list->subscribe( $user );
-		}
-
-
-		foreach ( $payment->cart_details as $line ) {
-			$download = new EDD_MailChimp_Download( (int) $line['id'] );
-			$preferences = $download->subscription_preferences();
-
-			$double_opt_in = get_post_meta( $post->ID, 'edd_mailchimp_double_opt_in', true );
-
-			foreach( $preferences as $preference ) {
-
-				$list = new EDD_MailChimp_List( $preference['remote_id'] );
-				$options = array( 'interests' => $preference['interests'] );
-				$is_double_opt_in = empty( $double_opt_in );
-				$options['double_opt_in'] = $is_double_opt_in;
-
-				edd_debug_log( 'completed_purchase_signup() about to subscribe customer. User data: ' . print_r( $user, true ) . 'Options data: ' . print_r( $options, true ) );
-
-				$subscribed = $list->subscribe( $user, $options );
-			
-				edd_debug_log( 'completed_purchase_signup() customer subscription result: ' . var_export( $subscribed, true ) );
-			
-			}
-		}
 	}
 
 }
