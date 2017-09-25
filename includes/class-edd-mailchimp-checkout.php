@@ -103,12 +103,12 @@ class EDD_MailChimp_Checkout {
 				edd_debug_log( 'completed_purchase_signup() about to subscribe customer. User data: ' . print_r( $user, true ) . 'Options data: ' . print_r( $options, true ) );
 
 				$subscribed = $list->subscribe( $user, $options );
-			
+
 				edd_debug_log( 'completed_purchase_signup() customer subscription result: ' . var_export( $subscribed, true ) );
-			
+
 			}
 		}
-		
+
 		edd_debug_log( 'completed_purchase_signup() completed for payment ' . $payment_id );
 
 	}
