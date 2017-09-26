@@ -66,7 +66,7 @@ class EDD_MailChimp {
 			// $completed_upgrades = get_option( 'edd_completed_upgrades' );
 
 			// foreach ($completed_upgrades as $i => $value) {
-			//   if ($value == 'upgrade_mailchimp_groupings_settings') {
+			//   if ($value == 'upgrade_mailchimp_api3_default_list') {
 			//     unset($completed_upgrades[$i]);
 			//   }
 			// }
@@ -74,7 +74,7 @@ class EDD_MailChimp {
 			// update_option( 'edd_completed_upgrades', $completed_upgrades );
 			// DEV ONLY
 
-			if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_groupings_settings' ) ) {
+			if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_api3_default_list' ) ) {
 
 				// Require upgrade routine
 				if ( ! class_exists( 'EDD_MailChimp_V3_Upgrade' ) ) {

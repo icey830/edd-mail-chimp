@@ -38,7 +38,7 @@ class EDD_MailChimp_Database {
 	public function activation( $network_wide ) {
 
 		// When new upgrade routines are added, mark them as complete on fresh install
-		edd_set_upgrade_complete( 'upgrade_mailchimp_api3' );
+		edd_set_upgrade_complete( 'upgrade_mailchimp_api3_default_list' );
 
 		if ( is_multisite() && $network_wide ) { // See if being activated on the entire network or one blog
 			global $wpdb;
