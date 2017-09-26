@@ -7,6 +7,8 @@ class EDD_MailChimp_Sync extends WP_Background_Process {
 	 */
 	protected $action = 'edd_mailchimp_sync';
 
+	protected $full_sync = false;
+
 	/**
 	 * Task
 	 *
