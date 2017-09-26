@@ -53,8 +53,7 @@ class EDD_MailChimp_V3_Upgrade {
 		if ( isset( $_GET['page'] ) && $_GET['page'] == 'edd-upgrades' ) {
 			return; // Don't show notices on the upgrades page
 		}
-
-		if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_api3' ) ) {
+		if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_api3_default_list' ) ) {
 			printf(
 				'<div class="updated"><p>' . __( 'Easy Digital Downloads needs to upgrade your MailChimp settings, click <a href="%s">here</a> to start the upgrade.', 'eddmc' ) . '</p></div>',
 				esc_url( admin_url( 'index.php?page=edd-upgrades&edd-upgrade=upgrade_mailchimp_api3' ) )
@@ -111,8 +110,6 @@ class EDD_MailChimp_V3_Upgrade {
 			edd_delete_option( 'eddmc_list' );
 		}
 
-		// Mark this one as done.
-		edd_set_upgrade_complete( 'upgrade_mailchimp_api3_default_list' );
 	}
 
 
@@ -139,7 +136,7 @@ class EDD_MailChimp_V3_Upgrade {
 			foreach( $this->products->posts as $product ) {
 
 				edd_debug_log( 'convert_grouping_data(): conversion loop processing for Download ' . $product->ID );
-		
+
 				$settings = get_post_meta( $product->ID, '_edd_mailchimp', true );
 
 				if ( empty( $settings ) ) {
@@ -205,9 +202,9 @@ class EDD_MailChimp_V3_Upgrade {
 
 							// @todo Make sure multiple store sync jobs can be queued at the same time.
 							$store->sync();
-					
+
 							edd_debug_log( 'convert_grouping_data(): list ID ' . $list->remote_id . ' synced with store ' . $store->id );
-					
+
 						}
 
 						$interests = $list->interests();
@@ -227,9 +224,9 @@ class EDD_MailChimp_V3_Upgrade {
 						$list = new EDD_MailChimp_List( $list );
 
 						if ( ! $list->is_connected() && $list->exists() ) {
-						
+
 							edd_debug_log( 'convert_grouping_data(): list ID ' . $list->remote_id . ' not connected but does exist' );
-						
+
 							$response = $list->api->getLastResponse();
 							$record = json_decode( $response['body'], true );
 
@@ -240,7 +237,7 @@ class EDD_MailChimp_V3_Upgrade {
 							$store->sync();
 
 							edd_debug_log( 'convert_grouping_data(): list ID ' . $list->remote_id . ' synced with store ' . $store->id );
-					
+
 						}
 
 					}
@@ -369,7 +366,7 @@ class EDD_MailChimp_V3_Upgrade {
 	 * @return void
 	 */
 	private static function mark_as_complete() {
-		edd_set_upgrade_complete( 'upgrade_mailchimp_api3' );
+		edd_set_upgrade_complete( 'upgrade_mailchimp_api3_default_list' );
 		delete_site_option( 'edd_doing_upgrade' );
 	}
 
