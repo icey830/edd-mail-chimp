@@ -169,6 +169,7 @@ class EDD_MailChimp_Ecommerce {
 				} else {
 
 					edd_debug_log( 'add_order() payment ' . $payment_id . ' added for default list successfully' );
+					edd_debug_log( 'add_order() payment ' . $payment_id . ' API response for default list:' . var_export( $store->api->getLastResponse(), true ) );
 
 				}
 
@@ -199,6 +200,7 @@ class EDD_MailChimp_Ecommerce {
 						} else {
 
 							edd_debug_log( 'add_order() payment ' . $payment_id . ' added successfully' );
+							edd_debug_log( 'add_order() payment ' . $payment_id . ' API response for default list:' . var_export( $store->api->getLastResponse(), true ) );
 
 						}
 

@@ -60,8 +60,8 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 				//   'country_code'  => '',
 				// )
 			),
-			'financial_status'     => $this->_payment->status_nicename,
-			'fulfillment_status'   => $this->_payment->status_nicename,
+			'financial_status'     => 'pending',
+			'fulfillment_status'   => 'pending',
 			'landing_site'         => home_url(),
 			'currency_code'        => $this->_payment->currency,
 			'order_total'          => $this->_payment->total,
