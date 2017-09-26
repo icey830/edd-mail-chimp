@@ -89,7 +89,7 @@ class EDD_MailChimp_Ecommerce {
 		// Set Ecommerce360 variables if they exist
 		$campaign_id = get_post_meta( $payment_id, '_edd_mc_campaign_id', true );
 
-		edd_debug_log( 'add_order(): campaign ID for payment ' . $payment_id . ' is: ' . $campaign_id );
+		edd_debug_log( 'add_order(): campaign ID for payment ' . $payment_id . ' is: ' . var_export( $campaign_id, true ) );
 
 		/**
 		 * In July 2017, the Easy Digital Downloads team decided that the email address
@@ -162,8 +162,14 @@ class EDD_MailChimp_Ecommerce {
 				$store->orders->add( $order );
 
 				if( ! $store->api->success() ) {
+
 					edd_debug_log( 'add_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
 					edd_debug_log( 'add_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
+
+				} else {
+
+					edd_debug_log( 'add_order() payment ' . $payment_id . ' added for default list successfully' );
+
 				}
 
 			}
