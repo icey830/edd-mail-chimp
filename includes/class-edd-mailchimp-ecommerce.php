@@ -14,6 +14,7 @@ class EDD_MailChimp_Ecommerce {
 		add_action( 'edd_insert_payment', array( $this, 'set_ecommerce_flags' ), 10, 2 );
 		add_action( 'edd_complete_purchase', array( $this, 'add_order' ), 20, 3 );
 		add_action( 'edd_post_refund_payment', array( $this, 'refund_order' ), 10 );
+		add_action( 'edd_update_payment_status', array( $this, 'cancel_order' ), 10, 3 );
 	}
 
 	/**
@@ -247,7 +248,7 @@ class EDD_MailChimp_Ecommerce {
 
 				} else {
 
-					edd_debug_log( 'refund_order() payment ' . $payment->ID . ' removed successfully' );
+					edd_debug_log( 'refund_order() payment ' . $payment->ID . ' updated successfully' );
 
 				}
 
@@ -273,7 +274,7 @@ class EDD_MailChimp_Ecommerce {
 
 						} else {
 
-							edd_debug_log( 'refund_order() payment ' . $payment_id . ' removed from default list successfully' );
+							edd_debug_log( 'refund_order() payment ' . $payment_id . ' updated on default list successfully' );
 
 						}
 
@@ -285,7 +286,82 @@ class EDD_MailChimp_Ecommerce {
 			return true;
 
 		} catch (Exception $e) {
-			edd_debug_log( 'refund_order(): Exception encountered while removing ' . $payment_id . ' from list' );
+			edd_debug_log( 'refund_order(): Exception encountered while updating ' . $payment_id . ' on list' );
+			edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
+			return false;
+		}
+
+	}
+
+	/**
+	 * Mark an order as cancelled in MailChimp
+	 *
+	 * @return bool
+	 */
+	public function cancel_order( $payment_id, $new_status, $old_status ) {
+
+		if( 'cancelled' != $new_status && 'failed' !== $new_status ) {
+			return;
+		}
+
+		$order = new EDD_MailChimp_Order( $payment->ID );
+
+		edd_debug_log( 'cancel_order() processing for ' . $payment->ID );
+
+		try {
+			$default_list = EDD_MailChimp_List::get_default();
+
+			if ( $default_list ) {
+
+				$store = EDD_MailChimp_Store::find_or_create( $default_list );
+				$store->orders->add( $order );
+
+				if( ! $store->api->success() ) {
+
+					edd_debug_log( 'cancel_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+					edd_debug_log( 'cancel_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
+
+				} else {
+
+					edd_debug_log( 'cancel_order() payment ' . $payment->ID . ' updated successfully' );
+
+				}
+
+			}
+
+			foreach( $order->lines as $line_item ) {
+
+				$download = new EDD_MailChimp_Download( (int) $line_item['product_id'] );
+				$preferences = $download->subscription_preferences();
+
+				if ( ! empty( $preferences ) ) {
+
+					foreach( $preferences as $list ) {
+
+						$list = new EDD_MailChimp_List( $list['remote_id'] );
+						$store = EDD_MailChimp_Store::find_or_create( $list );
+						$store->orders->add( $order );
+
+						if( ! $store->api->success() ) {
+
+							edd_debug_log( 'cancel_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+							edd_debug_log( 'cancel_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
+
+						} else {
+
+							edd_debug_log( 'cancel_order() payment ' . $payment_id . ' updated on default list successfully' );
+
+						}
+
+					}
+				}
+			}
+
+			edd_insert_payment_note( $payment_id, __( 'Order details have been updated in MailChimp.', 'eddmc' ) );
+			return true;
+
+		} catch (Exception $e) {
+			edd_debug_log( 'cancel_order(): Exception encountered while update ' . $payment_id . ' on list' );
 			edd_insert_payment_note( $payment_id, __( 'MailChimp Ecommerce360 Error: ', 'eddmc' ) . $e->getMessage() );
 			return false;
 		}

@@ -44,6 +44,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 				$status = 'refunded';
 				break;
 
+			case 'failed' :
 			case 'cancelled' :
 				$status = 'cancelled';
 				break;
