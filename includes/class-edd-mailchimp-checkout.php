@@ -105,6 +105,17 @@ class EDD_MailChimp_Checkout {
 				$subscribed = $list->subscribe( $user, $options );
 
 				edd_debug_log( 'completed_purchase_signup() customer subscription result: ' . var_export( $subscribed, true ) );
+			
+				if( $subscribed ) {
+
+					edd_debug_log( 'completed_purchase_signup() customer subscription response from MailChimp: ' . var_export( $list->getLastResponse(), true ) );
+				
+				} else {
+
+					edd_debug_log( 'completed_purchase_signup() MailChimp request:' . var_export( $list->getLastRequest(), true ) );
+					edd_debug_log( 'completed_purchase_signup() MailChimp error:' . var_export( $list->getLastError(), true ) );
+
+				}
 
 			}
 		}
