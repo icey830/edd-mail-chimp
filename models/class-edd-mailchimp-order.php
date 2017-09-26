@@ -38,6 +38,25 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 
 		$customer = new EDD_MailChimp_Customer( (int) $this->_payment->customer_id );
 
+		switch( $this->_payment->status ) {
+
+			case 'refunded' :
+				$status = 'refunded';
+				break;
+
+			case 'cancelled' :
+				$status = 'cancelled';
+				break;
+
+			case 'publish' :
+			case 'complete':
+			case 'revoked' :
+			default :
+
+				$status = 'pending';
+				break;
+		}
+
 		$order = array(
 			'id'       => (string) $this->_payment->ID,
 			'customer' => array(
@@ -60,8 +79,8 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 				//   'country_code'  => '',
 				// )
 			),
-			'financial_status'     => 'pending',
-			'fulfillment_status'   => 'pending',
+			'financial_status'     => $status,
+			'fulfillment_status'   => $status,
 			'landing_site'         => home_url(),
 			'currency_code'        => $this->_payment->currency,
 			'order_total'          => $this->_payment->total,
