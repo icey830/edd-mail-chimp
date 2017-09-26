@@ -90,7 +90,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 		);
 
 		foreach ( $this->_payment->cart_details as $line ) {
-			if ( absint( $line['item_number']['options']['price_id'] ) === 0 ) {
+			if ( isset( $line['item_number']['options']['price_id'] ) || null === $line['item_number']['options']['price_id'] ) {
 				$variant_id = $line['id'] . '_1';
 			} else {
 				$variant_id = $line['id'] . '_' . $line['item_number']['options']['price_id'];
