@@ -95,10 +95,10 @@ class EDD_MailChimp_Actions {
 						'settings-updated' => false,
 						'tab'              => 'extensions',
 						'edd_mailchimp_list_disconnected' => 1,
+						'section' => 'mailchimp'
 					) );
 
-					// Remove the section from the tabs so we always end up at the main section
-					$redirect_url = remove_query_arg( array('section', 'edd-action', 'mailchimp_list_remote_id'), $redirect_url );
+					$redirect_url = remove_query_arg( array( 'edd-action', 'mailchimp_list_remote_id'), $redirect_url );
 
 					wp_safe_redirect( $redirect_url );
 					exit;
