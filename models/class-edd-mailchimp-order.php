@@ -65,7 +65,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 			'landing_site'         => home_url(),
 			'currency_code'        => $this->_payment->currency,
 			'order_total'          => $this->_payment->total,
-			'order_url'            => add_query_arg( 'id', $this->_payment->ID, admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details' ) ),
+			'order_url'            => add_query_arg( 'payment_key', $this->_payment->key, edd_get_success_page_uri() ),
 			'tax_total'            => $this->_payment->tax,
 			'processed_at_foreign' => $this->_payment->completed_date,
 			'lines' => array(),
