@@ -338,11 +338,9 @@ class EDD_MailChimp_Settings {
 						</tr>
 					</thead>
 					<tbody>
-						<?php
+						<?php if ( isset( $result['lists'] ) && ! empty( $result['lists'] ) && count( $connected_list_ids ) < count( $result['lists'] ) ) : ?>
 
-						if ( isset( $result['lists'] ) && ! empty( $result['lists'] ) ) :
-
-							foreach ( $result['lists'] as $list ) :
+							<?php foreach ( $result['lists'] as $list ) :
 
 								if ( in_array( $list['id'], $connected_list_ids ) ) {
 									continue;
@@ -360,10 +358,18 @@ class EDD_MailChimp_Settings {
 									</td>
 								</tr>
 
-							<?php endforeach; endif; ?>
-						</tbody>
-					</table>
-				</div>
-				<?php
-			}
-		}
+							<?php endforeach; ?>
+
+						<?php else : ?>
+							<tr>
+								<td colspan="2">
+									<?php _e( 'No additional lists available', 'eddmc' ); ?>
+								</td>
+							</tr>
+						<?php endif; ?>
+					</tbody>
+				</table>
+			</div>
+		<?php
+	}
+}
