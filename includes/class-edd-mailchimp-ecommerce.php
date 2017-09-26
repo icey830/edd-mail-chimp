@@ -161,7 +161,10 @@ class EDD_MailChimp_Ecommerce {
 				$store = EDD_MailChimp_Store::find_or_create( $default_list );
 				$store->orders->add( $order );
 
-				edd_debug_log( 'add_order(): payment ' . $payment_id . ' order added for default list. Order data: ' . print_r( $order, true ) );
+				if( ! $store->api->success() ) {
+					edd_debug_log( 'add_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+					edd_debug_log( 'add_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
+				}
 
 			}
 
@@ -181,8 +184,17 @@ class EDD_MailChimp_Ecommerce {
 
 						$store = EDD_MailChimp_Store::find_or_create( $list );
 						$store->orders->add( $order );
-			
-						edd_debug_log( 'add_order(): payment ' . $payment_id . ' order added for list ' . $list->remote_id . '. Order data: ' . print_r( $order, true ) );
+
+						if( ! $store->api->success() ) {
+
+							edd_debug_log( 'add_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+							edd_debug_log( 'add_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
+
+						} else {
+
+							edd_debug_log( 'add_order() payment ' . $payment_id . ' added successfully' );
+
+						}
 
 					}
 				}
@@ -224,21 +236,47 @@ class EDD_MailChimp_Ecommerce {
 			$default_list = EDD_MailChimp_List::get_default();
 
 			if ( $default_list ) {
+
 				$store = EDD_MailChimp_Store::find_or_create( $default_list );
 				$store->orders->remove( $order );
-				edd_debug_log( 'remove_order(): Order ' . $payment_id . ' removed from default list ' . $default_list->remote_id );
+
+				if( ! $store->api->success() ) {
+
+					edd_debug_log( 'remove_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+					edd_debug_log( 'remove_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
+
+				} else {
+
+					edd_debug_log( 'remove_order() payment ' . $payment_id . ' removed successfully' );
+
+				}
+
 			}
 
 			foreach( $order->lines as $line_item ) {
+
 				$download = new EDD_MailChimp_Download( (int) $line_item['product_id'] );
 				$preferences = $download->subscription_preferences();
 
 				if ( ! empty( $preferences ) ) {
+
 					foreach( $preferences as $list ) {
+
 						$list = new EDD_MailChimp_List( $list['remote_id'] );
 						$store = EDD_MailChimp_Store::find_or_create( $list );
 						$store->orders->remove( $order );
-						edd_debug_log( 'remove_order(): Order ' . $payment_id . ' removed from default list ' . $list->remote_id );
+
+						if( ! $store->api->success() ) {
+
+							edd_debug_log( 'remove_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+							edd_debug_log( 'remove_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
+
+						} else {
+
+							edd_debug_log( 'remove_order() payment ' . $payment_id . ' removed from default list successfully' );
+
+						}
+
 					}
 				}
 			}
