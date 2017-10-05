@@ -151,7 +151,7 @@ class EDD_MailChimp_Database {
 		';
 
 		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-		dbDelta($sql);
+		@dbDelta($sql);
 	}
 
 	/**
