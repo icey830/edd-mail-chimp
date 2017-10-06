@@ -74,13 +74,17 @@ class EDD_MailChimp {
 			// update_option( 'edd_completed_upgrades', $completed_upgrades );
 			// DEV ONLY
 
-			if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_api3_default_list' ) ) {
+			if ( ! edd_has_upgrade_completed( 'upgrade_mailchimp_api3_default_list' ) && ! empty( get_option( 'eddmc_list' ) ) ) {
 
 				// Require upgrade routine
 				if ( ! class_exists( 'EDD_MailChimp_V3_Upgrade' ) ) {
 					include( EDD_MAILCHIMP_PATH . '/includes/class-edd-mailchimp-v3-upgrade.php' );
 					new EDD_MailChimp_V3_Upgrade;
 				}
+			} else {
+				edd_set_upgrade_complete( 'upgrade_mailchimp_api3' );
+				edd_set_upgrade_complete( 'upgrade_mailchimp_api3_default_list' );
+				edd_set_upgrade_complete( 'upgrade_mailchimp_api3_default_list' );
 			}
 		}
 	}
