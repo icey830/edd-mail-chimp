@@ -94,7 +94,7 @@ class EDD_MailChimp_Ecommerce {
 
 		/**
 		 * In July 2017, the Easy Digital Downloads team decided that the email address
-		 * entered by the customer during checkout should be the authorative factor in
+		 * entered by the customer during checkout should be the authoritative factor in
 		 * determining which email address the EDD order should be associated with.
 		 *
 		 * This email address _could_ be different than the one associated with the unique
@@ -159,10 +159,17 @@ class EDD_MailChimp_Ecommerce {
 					$order->campaign_id = $campaign_id;
 				}
 
-				$store = EDD_MailChimp_Store::find_or_create( $default_list );
-				$store->orders->add( $order );
+				$store    = EDD_MailChimp_Store::find_or_create( $default_list );
+				$response = $store->orders->add( $order );
 
-				if( ! $store->api->success() ) {
+				if( ! empty( $response['status'] ) && $response['status'] >= 400 ) {
+
+					$error_message = ! empty( $response[ 'detail' ] ) ? $response[ 'detail' ] : __( 'An error ocurred while sending order details to MailChimp.', 'edd-mailchimp' );
+
+					edd_debug_log( 'add_order() MailChimp error: ' . $error_message );
+					edd_debug_log( 'add_order() EDD Order:' . var_export( $order, true ) );
+
+				} else if ( ! $store->api->success() ) {
 
 					edd_debug_log( 'add_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
 					edd_debug_log( 'add_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );

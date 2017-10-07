@@ -26,6 +26,8 @@ class EDD_MailChimp_Sync extends WP_Background_Process {
 		$mailchimp = new EDD_MailChimp_API;
 		$store     = EDD_MailChimp_Store::find_or_create( $data['payload']['list_id'] );
 
+		edd_debug_log( 'EDD_MailChimp_Sync::task() ' . $data['status'] );
+
 		switch( $data['status'] ) {
 
 			case 'queued':

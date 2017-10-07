@@ -110,23 +110,25 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 		);
 
 		foreach ( $this->_payment->cart_details as $line ) {
-			if ( ! isset( $line['item_number']['options']['price_id'] ) || null === $line['item_number']['options']['price_id'] ) {
+
+			if ( ! edd_has_variable_prices( $line['id'] ) ) {
 				$variant_id = $line['id'] . '_1';
 			} else {
 				$variant_id = $line['id'] . '_' . $line['item_number']['options']['price_id'];
 			}
 
 			$order['lines'][] = array(
-				'id'         => (string) $line['id'],
-				'product_id' => (string) $line['id'],
+				'id'                 => (string) $line['id'],
+				'product_id'         => (string) $line['id'],
 				'product_variant_id' => $variant_id,
-				'quantity'   => $line['quantity'],
-				'price'      => $line['price'],
-				'discount'   => $line['discount']
+				'quantity'           => $line['quantity'],
+				'price'              => $line['price'],
+				'discount'           => $line['discount']
 			);
 		}
 
 		$this->_record = apply_filters( 'edd.mailchimp.order', $order, $this->_payment );
 		return $this;
+
 	}
 }
