@@ -112,7 +112,7 @@ class EDD_MailChimp_Checkout {
 				
 				} else {
 
-					edd_debug_log( 'completed_purchase_signup() MailChimp request:' . var_export( $list->api->getLastRequest(), true ) );
+					//edd_debug_log( 'completed_purchase_signup() MailChimp request:' . var_export( $list->api->getLastRequest(), true ) );
 					edd_debug_log( 'completed_purchase_signup() MailChimp error:' . var_export( $list->api->getLastError(), true ) );
 
 				}
