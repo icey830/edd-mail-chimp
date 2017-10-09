@@ -112,7 +112,7 @@ class EDD_MailChimp_Product extends EDD_MailChimp_Model {
 		} else {
 
 			$variant = array(
-				'id'    => (string) $this->download->ID . '_1',
+				'id'    => (string) $this->download->ID,
 				'title' => $this->download->post_title,
 				'url'   => get_permalink( $this->download->ID ),
 				'price' => $this->download->get_price(),

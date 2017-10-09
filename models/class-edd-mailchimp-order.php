@@ -120,7 +120,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 			$order['lines'][] = array(
 				'id'                 => $this->_payment->ID . '_' . $cart_key,
 				'product_id'         => (string) $line['id'],
-				'product_variant_id' => $variant_id,
+				'product_variant_id' => (string) $variant_id,
 				'quantity'           => $line['quantity'],
 				'price'              => $line['price'],
 				'discount'           => $line['discount']
@@ -128,6 +128,7 @@ class EDD_MailChimp_Order extends EDD_MailChimp_Model {
 		}
 
 		$this->_record = apply_filters( 'edd.mailchimp.order', $order, $this->_payment );
+
 		return $this;
 
 	}

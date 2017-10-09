@@ -167,11 +167,11 @@ class EDD_MailChimp_Ecommerce {
 					$error_message = ! empty( $response[ 'detail' ] ) ? $response[ 'detail' ] : __( 'An error occurred while sending order details to MailChimp.', 'edd-mailchimp' );
 
 					edd_debug_log( 'add_order() MailChimp response error: ' . $error_message );
-					//edd_debug_log( 'add_order() EDD Order:' . var_export( $order, true ) );
+					edd_debug_log( 'add_order() EDD Order:' . var_export( $order, true ) );
 
 				} else if ( ! $store->api->success() ) {
 
-					//edd_debug_log( 'add_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+					edd_debug_log( 'add_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
 					edd_debug_log( 'add_order() MailChimp store error:' . var_export( $store->api->getLastError(), true ) );
 
 				} else {
@@ -207,11 +207,11 @@ class EDD_MailChimp_Ecommerce {
 							$error_message = ! empty( $response[ 'detail' ] ) ? $response[ 'detail' ] : __( 'An error occurred while sending order details to MailChimp.', 'edd-mailchimp' );
 
 							edd_debug_log( 'add_order() MailChimp response error: ' . $error_message );
-							//edd_debug_log( 'add_order() EDD Order:' . var_export( $order, true ) );
+							edd_debug_log( 'add_order() EDD Order:' . var_export( $order, true ) );
 
 						} else if ( ! $store->api->success() ) {
 
-							//edd_debug_log( 'add_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+							edd_debug_log( 'add_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
 							edd_debug_log( 'add_order() MailChimp store error:' . var_export( $store->api->getLastError(), true ) );
 
 						} else {
@@ -259,7 +259,7 @@ class EDD_MailChimp_Ecommerce {
 
 				if( ! $store->api->success() ) {
 
-					//edd_debug_log( 'refund_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+					edd_debug_log( 'refund_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
 					edd_debug_log( 'refund_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
 
 				} else {
@@ -285,7 +285,7 @@ class EDD_MailChimp_Ecommerce {
 
 						if( ! $store->api->success() ) {
 
-							//edd_debug_log( 'refund_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+							edd_debug_log( 'refund_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
 							edd_debug_log( 'refund_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
 
 						} else {
@@ -334,7 +334,7 @@ class EDD_MailChimp_Ecommerce {
 
 				if( ! $store->api->success() ) {
 
-					//edd_debug_log( 'cancel_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+					edd_debug_log( 'cancel_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
 					edd_debug_log( 'cancel_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
 
 				} else {
@@ -360,7 +360,7 @@ class EDD_MailChimp_Ecommerce {
 
 						if( ! $store->api->success() ) {
 
-							//edd_debug_log( 'cancel_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
+							edd_debug_log( 'cancel_order() MailChimp request:' . var_export( $store->api->getLastRequest(), true ) );
 							edd_debug_log( 'cancel_order() MailChimp error:' . var_export( $store->api->getLastError(), true ) );
 
 						} else {
