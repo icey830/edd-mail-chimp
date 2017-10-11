@@ -31,7 +31,7 @@ class EDD_MailChimp_Metabox {
 			<script>
 				(function($){
 					$(document).ready(function() {
-						
+
 						var unchecked = $('.edd-mailchimp-list:not(:checked)');
 
 						unchecked.map(function(i) {
@@ -45,7 +45,7 @@ class EDD_MailChimp_Metabox {
 								$interests.fadeOut();
 							}
 						});
-						
+
 						$('.edd-mailchimp-list').change(function() {
 							var list_id = this.value;
 							var $interests = $('[data-mailchimp-list="' + list_id + '"]');
@@ -100,7 +100,7 @@ class EDD_MailChimp_Metabox {
 					foreach ( $interests as $interest ){
 						echo '<label data-mailchimp-list="'. esc_attr($list->id) .'">';
 							echo '&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="edd_mailchimp_interests[]" value="' . esc_attr( $interest->id ) . '"' . checked( true, in_array( $interest->id, $preferred_interest_ids ), false ) . '>';
-							echo '&nbsp;' . $interest->interest_name;
+							echo '&nbsp;' . $interest->interest_category_name . ': ' . $interest->interest_name;
 							echo '<br/>';
 						echo '</label>';
 					}
