@@ -1,12 +1,12 @@
 <?php
 /*
 Plugin Name: Easy Digital Downloads - MailChimp
-Plugin URL: http://easydigitaldownloads.com/extension/mail-chimp
+Plugin URL: http://easydigitaldownloads.com/downloads/mail-chimp
 Description: Include a MailChimp signup option with your Easy Digital Downloads checkout
 Version: 2.5.6
-Author: Pippin Williamson
-Author URI: http://pippinsplugins.com
-Contributors: Pippin Williamson, Dave Kiss
+Author: Easy Digital Downloads, LLC
+Author URI: https://easydigitaldownloads.com
+Contributors: Pippin Williamson
 */
 
 define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
@@ -19,7 +19,7 @@ define( 'EDD_MAILCHIMP_PATH', dirname( __FILE__ ) );
 */
 
 if ( class_exists( 'EDD_License' ) && is_admin() ) {
-  $eddmc_license = new EDD_License( __FILE__, EDD_MAILCHIMP_PRODUCT_NAME, '2.5.6', 'Pippin Williamson' );
+  $eddmc_license = new EDD_License( __FILE__, EDD_MAILCHIMP_PRODUCT_NAME, '2.5.6', 'Easy Digital Downloads', null, null, 746 );
 }
 
 if( ! class_exists( 'EDD_MailChimp_API' ) ) {
