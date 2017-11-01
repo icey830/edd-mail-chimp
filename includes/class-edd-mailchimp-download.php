@@ -23,12 +23,13 @@ class EDD_MailChimp_Download extends EDD_Download {
 			$old_lists     = array();
 			$old_interests = array();
 			foreach ( $old_list_data as $old_data ) {
-				if ( strpos( '|', $old_data ) ) { // This is an old 'interest'.
+				if ( strpos( $old_data, '|' ) ) { // This is an old 'interest'.
 
 					// Old format is Remote List ID, old ID, and interest name
 					$old_interest  = explode( '|', $old_data, 3 );
 					$list_id       = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->edd_mailchimp_lists WHERE remote_id = %s", $old_interest[0] ) );
 					$interest_name = $old_interest[2];
+
 					if ( ! empty( $list_id ) ) {
 						$interest_id = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $wpdb->edd_mailchimp_interests WHERE list_id = %d AND interest_name ='%s'", (int) $list_id, $interest_name ) );
 					}
