@@ -28,6 +28,12 @@ class EDD_MailChimp {
 	 * @return instanceof EDD_MailChimp_Extension
 	 */
 	public static function instance() {
+
+		// Return early if Easy Digital Downloads core is not detected
+		if ( ! class_exists( 'Easy_Digital_Downloads' ) ) {
+			return;
+		}
+
 		if ( ! isset( self::$instance ) AND ! ( self::$instance instanceof EDD_MailChimp_Extension ) ) {
 			self::$instance = new self;
 			self::$instance->_define_constants();
@@ -39,6 +45,7 @@ class EDD_MailChimp {
 		}
 
 		return self::$instance;
+
 	}
 
 	public function __construct() {
