@@ -3,7 +3,7 @@
 Plugin Name: Easy Digital Downloads - MailChimp
 Plugin URL: http://easydigitaldownloads.com/extension/mail-chimp
 Description: Subscribe customers to MailChimp lists when purchasing products through Easy Digital Downloads
-Version: 2.5.6
+Version: 3.0-beta1
 Author: Easy Digital Downloads
 Author URI: https://easydigitaldownloads.com
 */
@@ -121,7 +121,7 @@ class EDD_MailChimp {
 		}
 
 		define( 'EDD_MAILCHIMP_PRODUCT_NAME', 'Mail Chimp' );
-		define( 'EDD_MAILCHIMP_VERSION', '2.5.6' );
+		define( 'EDD_MAILCHIMP_VERSION', '3.0-beta1' );
 		define( 'EDD_MAILCHIMP_URL',  plugin_dir_url(__FILE__) );
 		define( 'EDD_MAILCHIMP_PATH', plugin_dir_path(__FILE__) );
 		define( 'EDD_MAILCHIMP_BASENAME', plugin_basename( __FILE__ ) );
